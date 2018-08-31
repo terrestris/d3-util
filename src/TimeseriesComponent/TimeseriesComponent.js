@@ -1,6 +1,8 @@
 import ChartDataUtil from '../ChartDataUtil/ChartDataUtil';
 import ScaleUtil from '../ScaleUtil/ScaleUtil';
+import AxesUtil from '../AxesUtil/AxesUtil';
 import scaleLinear from 'd3-scale/src/linear';
+import scaleTime from 'd3-scale/src/time';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -98,33 +100,51 @@ class TimeseriesComponent {
   /**
    * Creates the d3 scale objects.
    * @param  {object} series the series to get the scales for
-   * @param  {array} size the size of the chart
-   * @return {array} an array with the x and y scales
+   * @param  {number[]} size the size of the chart
+   * @return {number[]} an array with the x and y scales
    */
   createScales(series, size) {
     let x;
     let y;
     switch (series.scaleX) {
-      case 'linear': {
-        x = scaleLinear()
-          .range([0, size[0]]);
-        ScaleUtil.setDomainForScale({scale: series.scaleX}, x, series.data.filter(d => d).map(d => d[0]));
-      }
+      case 'linear': x = scaleLinear();
+        break;
+      case 'time': x = scaleTime();
+        break;
     }
     switch (series.scaleY) {
-      case 'linear': {
-        y = scaleLinear()
-          .range([0, size[1]]);
-        ScaleUtil.setDomainForScale({scale: series.scaleY}, y, series.data.filter(d => d).map(d => d[1]));
-      }
+      case 'linear': y = scaleLinear();
+        break;
+      case 'time': y = scaleTime();
     }
+    x.range([10, size[0] - 10]);
+    y.range([10, size[1] - 10]);
+    ScaleUtil.setDomainForScale({scale: series.scaleX}, x, series.data.filter(d => d).map(d => d[0]));
+    ScaleUtil.setDomainForScale({scale: series.scaleY}, y, series.data.filter(d => d).map(d => d[1]));
     return [x, y];
+  }
+
+  /**
+   * Creates d3 axes from the given scales.
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   * @param  {object} series the series configuration
+   * @param  {selection} selection the d3 selection to append the axes to
+   * @param  {number[]} size the chart size
+   */
+  drawAxes(x, y, series, selection, size) {
+    const [xAxis, yAxis] = AxesUtil.createAxes(series, x, y);
+
+    selection.append('g')
+      .attr('transform', `translate(0, ${size[1]})`)
+      .call(xAxis);
+    selection.append('g').call(yAxis);
   }
 
   /**
    * Render the timeseries to the given root node.
    * @param  {d3.selection} root the root node
-   * @param  {array} size the size of the svg
+   * @param  {number[]} size the size of the svg
    */
   render(root, size) {
     const g = root.append('g');
@@ -132,6 +152,7 @@ class TimeseriesComponent {
       const [x, y] = this.createScales(line, size);
       this.renderDots(g, line, idx, x, y);
       this.renderLine(g, line, idx, x, y);
+      this.drawAxes(x, y, line, g, size);
     });
   }
 
