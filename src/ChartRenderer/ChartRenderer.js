@@ -1,4 +1,4 @@
-import {select} from 'd3-selection';
+import select from 'd3-selection/src/select';
 
 /**
  * Renders a chart according to its configuration.
@@ -43,14 +43,15 @@ class ChartRenderer {
    */
   render(element) {
     const {
-      components
+      components,
+      size
     } = this.chartConfig;
 
     select(element).selectAll('svg').remove();
 
     const svg = this.createSvgRoot(element);
 
-    components.forEach(component => component.render(svg));
+    components.forEach(component => component.render(svg, size));
   }
 
 }
