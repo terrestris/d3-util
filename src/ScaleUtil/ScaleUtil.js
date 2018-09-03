@@ -9,11 +9,11 @@ class ScaleUtil {
    * Recalculates min/max values from data and axis configuration.
    * @param {object} axis the axis configuration, with scale, min and max
    *  properties set
-   * @param {[type]} scale  [description]
-   * @param {[type]} orient [description]
-   * @param {[type]} config [description]
+   * @param {d3.scale} scale the d3 scale object
+   * @param {any[]} data the data to analyze
+   * @param {boolean} reverse whether to invert the data (y-axis)
    */
-  static setDomainForScale(axis, scale, data) {
+  static setDomainForScale(axis, scale, data, reverse) {
     let axisDomain;
     let makeDomainNice = true;
     let min;
@@ -53,6 +53,10 @@ class ScaleUtil {
       if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
         axisDomain[1] = Number.MIN_VALUE;
       }
+    }
+
+    if (reverse) {
+      axisDomain.reverse();
     }
 
     // actually set the domain

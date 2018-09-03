@@ -120,7 +120,7 @@ class TimeseriesComponent {
     x.range([10, size[0] - 10]);
     y.range([10, size[1] - 10]);
     ScaleUtil.setDomainForScale({scale: series.scaleX}, x, series.data.filter(d => d).map(d => d[0]));
-    ScaleUtil.setDomainForScale({scale: series.scaleY}, y, series.data.filter(d => d).map(d => d[1]));
+    ScaleUtil.setDomainForScale({scale: series.scaleY}, y, series.data.filter(d => d).map(d => d[1]), true);
     return [x, y];
   }
 
@@ -138,7 +138,8 @@ class TimeseriesComponent {
     selection.append('g')
       .attr('transform', `translate(0, ${size[1]})`)
       .call(xAxis);
-    selection.append('g').call(yAxis);
+    selection.append('g')
+      .call(yAxis);
   }
 
   /**
