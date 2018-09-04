@@ -3,6 +3,8 @@ import ScaleUtil from '../ScaleUtil/ScaleUtil';
 import AxesUtil from '../AxesUtil/AxesUtil';
 import scaleLinear from 'd3-scale/src/linear';
 import scaleTime from 'd3-scale/src/time';
+import zoom from 'd3-zoom/src/zoom';
+import {event} from 'd3-selection/src/selection/on';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -153,14 +155,47 @@ class TimeseriesComponent {
   }
 
   /**
+   * Enables zoom on the chart.
+   * @param {d3.selection} root the node for which to enable zoom
+   * @param {number[]} size the chart size
+   */
+  enableZoom(root, size) {
+    this.zoomBehaviour = zoom()
+      .scaleExtent([1, 10])
+      .on('zoom', () => {
+        const transform = event.transform;
+        this.mainScaleX = transform.rescaleX(this.originalScaleX);
+        this.mainScaleY = transform.rescaleY(this.originalScaleY);
+        this.render(root, size, true);
+      });
+    root.append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', size[0])
+      .attr('height', size[1])
+      .style('fill', 'none')
+      .style('pointer-events', 'all')
+      .call(this.zoomBehaviour);
+  }
+
+  /**
    * Render the timeseries to the given root node.
    * @param  {d3.selection} root the root node
    * @param  {number[]} size the size of the svg
+   * @param  {boolean} rerender if true, rerendering mode is enabled
    */
-  render(root, size) {
-    const g = root.append('g');
-    this.config.series.forEach((line) => {
-      const y = this.createScale(line.scaleY, size[1], line.data.filter(d => d).map(d => d[1]), true);
+  render(root, size, rerender) {
+    if (rerender) {
+      root.selectAll('g.timeseries').remove();
+    }
+    const g = root.append('g').attr('class', 'timeseries');
+    const yScales = [];
+    this.config.series.forEach((line, idx) => {
+      let y = this.createScale(line.scaleY, size[1], line.data.filter(d => d).map(d => d[1]), true);
+      if (rerender && idx === 0) {
+        y = this.mainScaleY;
+      }
+      yScales.push(y);
       if (line.drawAxis) {
         this.drawYAxis(y, line, g, size);
       }
@@ -168,15 +203,22 @@ class TimeseriesComponent {
     const axes = g.selectAll('.y-axis').nodes();
     const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
     const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
-    const x = this.createScale(this.config.scaleX, size[0] - width, xData, false);
+    const x = rerender ? this.mainScaleX : this.createScale(this.config.scaleX, size[0] - width, xData, false);
     this.config.series.forEach((line, idx) => {
-      const y = this.createScale(line.scaleY, size[1], line.data.filter(d => d).map(d => d[1]));
+      const y = yScales[idx];
       const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
       const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
       this.renderDots(dotsg, line, idx, x, y);
       this.renderLine(lineg, line, idx, x, y);
     });
     this.drawXAxis(x, g, size, width);
+    this.mainScaleY = yScales[0];
+    this.mainScaleX = x;
+    if (!rerender) {
+      this.enableZoom(root, size);
+      this.originalScaleX = x;
+      this.originalScaleY = yScales[0];
+    }
   }
 
 }
