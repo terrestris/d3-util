@@ -159,8 +159,10 @@ class TimeseriesComponent {
    */
   render(root, size) {
     const g = root.append('g');
+    const yScales = [];
     this.config.series.forEach((line) => {
       const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]), true);
+      yScales.push(y);
       if (line.drawAxis) {
         this.drawYAxis(y, line, g, size);
       }
@@ -170,7 +172,7 @@ class TimeseriesComponent {
     const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
     const x = this.createScale(this.config.scaleX, [size[0] - width, size[1]], xData, false);
     this.config.series.forEach((line, idx) => {
-      const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]));
+      const y = yScales[idx];
       const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
       const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
       this.renderDots(dotsg, line, idx, x, y);
