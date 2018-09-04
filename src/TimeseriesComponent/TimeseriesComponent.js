@@ -102,9 +102,10 @@ class TimeseriesComponent {
    * @param  {string} type the type of scale to create
    * @param  {number[]} size the size of the chart
    * @param  {number[]} data the data to create the scale for
+   * @param  {boolean} reverse whether to invert the scale
    * @return {d3.scale} the d3 scale object
    */
-  createScale(type, size, data) {
+  createScale(type, size, data, reverse) {
     let scale;
     switch (type) {
       case 'linear': scale = scaleLinear();
@@ -112,7 +113,7 @@ class TimeseriesComponent {
       case 'time': scale = scaleTime();
     }
     scale.range([10, size[1] - 10]);
-    ScaleUtil.setDomainForScale({scale: type}, scale, data.filter(d => d), true);
+    ScaleUtil.setDomainForScale({scale: type}, scale, data.filter(d => d), reverse);
     return scale;
   }
 
@@ -159,7 +160,7 @@ class TimeseriesComponent {
   render(root, size) {
     const g = root.append('g');
     this.config.series.forEach((line) => {
-      const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]));
+      const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]), true);
       if (line.drawAxis) {
         this.drawYAxis(y, line, g, size);
       }
@@ -167,7 +168,7 @@ class TimeseriesComponent {
     const axes = g.selectAll('.y-axis').nodes();
     const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
     const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
-    const x = this.createScale(this.config.scaleX, [size[0] - width, size[1]], xData);
+    const x = this.createScale(this.config.scaleX, [size[0] - width, size[1]], xData, false);
     this.config.series.forEach((line, idx) => {
       const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]));
       const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
