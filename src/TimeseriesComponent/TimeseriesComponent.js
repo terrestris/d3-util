@@ -98,48 +98,57 @@ class TimeseriesComponent {
   }
 
   /**
-   * Creates the d3 scale objects.
-   * @param  {object} series the series to get the scales for
+   * Create a d3 scale object.
+   * @param  {string} type the type of scale to create
    * @param  {number[]} size the size of the chart
-   * @return {number[]} an array with the x and y scales
+   * @param  {number[]} data the data to create the scale for
+   * @return {d3.scale} the d3 scale object
    */
-  createScales(series, size) {
-    let x;
-    let y;
-    switch (series.scaleX) {
-      case 'linear': x = scaleLinear();
+  createScale(type, size, data) {
+    let scale;
+    switch (type) {
+      case 'linear': scale = scaleLinear();
         break;
-      case 'time': x = scaleTime();
-        break;
+      case 'time': scale = scaleTime();
     }
-    switch (series.scaleY) {
-      case 'linear': y = scaleLinear();
-        break;
-      case 'time': y = scaleTime();
-    }
-    x.range([10, size[0] - 10]);
-    y.range([10, size[1] - 10]);
-    ScaleUtil.setDomainForScale({scale: series.scaleX}, x, series.data.filter(d => d).map(d => d[0]));
-    ScaleUtil.setDomainForScale({scale: series.scaleY}, y, series.data.filter(d => d).map(d => d[1]), true);
-    return [x, y];
+    scale.range([10, size[1] - 10]);
+    ScaleUtil.setDomainForScale({scale: type}, scale, data.filter(d => d), true);
+    return scale;
   }
 
   /**
-   * Creates d3 axes from the given scales.
-   * @param  {d3.scale} x the x scale
+   * Creates an d3 axis from the given scale.
    * @param  {d3.scale} y the y scale
    * @param  {object} series the series configuration
    * @param  {selection} selection the d3 selection to append the axes to
    * @param  {number[]} size the chart size
    */
-  drawAxes(x, y, series, selection, size) {
-    const [xAxis, yAxis] = AxesUtil.createAxes(series, x, y);
+  drawYAxis(y, series, selection) {
+    const yAxis = AxesUtil.createYAxis(series.scaleY, y);
+
+    const prevAxes = selection.selectAll('.y-axis').nodes();
+    const width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
 
     selection.append('g')
-      .attr('transform', `translate(0, ${size[1]})`)
-      .call(xAxis);
-    selection.append('g')
+      .attr('class', 'y-axis')
+      .attr('transform', `translate(${width}, 0)`)
       .call(yAxis);
+  }
+
+  /**
+   * Creates the x axis for a chart.
+   * @param  {d3.scale} x the d3 scale
+   * @param  {d3.selection} selection the d3 selection to add the axis to
+   * @param  {number[]} size the remaining chart size
+   * @param  {number} width the x offset to draw the chart at
+   */
+  drawXAxis(x, selection, size, width) {
+    const xAxis = AxesUtil.createXAxis(this.config.scaleX, x);
+
+    selection.append('g')
+      .attr('transform', `translate(${width}, ${size[1]})`)
+      .attr('class', 'x-axis')
+      .call(xAxis);
   }
 
   /**
@@ -149,12 +158,24 @@ class TimeseriesComponent {
    */
   render(root, size) {
     const g = root.append('g');
-    this.config.series.forEach((line, idx) => {
-      const [x, y] = this.createScales(line, size);
-      this.renderDots(g, line, idx, x, y);
-      this.renderLine(g, line, idx, x, y);
-      this.drawAxes(x, y, line, g, size);
+    this.config.series.forEach((line) => {
+      const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]));
+      if (line.drawAxis) {
+        this.drawYAxis(y, line, g, size);
+      }
     });
+    const axes = g.selectAll('.y-axis').nodes();
+    const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
+    const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
+    const x = this.createScale(this.config.scaleX, [size[0] - width, size[1]], xData);
+    this.config.series.forEach((line, idx) => {
+      const y = this.createScale(line.scaleY, size, line.data.filter(d => d).map(d => d[1]));
+      const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
+      const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
+      this.renderDots(dotsg, line, idx, x, y);
+      this.renderLine(lineg, line, idx, x, y);
+    });
+    this.drawXAxis(x, g, size, width);
   }
 
 }

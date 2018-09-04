@@ -50,23 +50,37 @@ class AxesUtil {
   }
 
   /**
-   * Creates new d3 axis objects.
+   * Create an x axis.
+   * @param  {string}  type  the type of the axis
+   * @param  {d3.scale}  scale the d3 scale object
+   * @return {d3.axis} the d3 axis object
    */
-  static createAxes(series, scaleX, scaleY) {
+  static createXAxis(type, scale) {
     let tickFormatter;
-    if (series.scaleX === 'time') {
+    if (type === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
     } else {
       tickFormatter = s => s;
     }
-    const x = axisBottom(scaleX).tickFormat(tickFormatter);
-    if (series.scaleY === 'time') {
+    const x = axisBottom(scale).tickFormat(tickFormatter);
+    return x;
+  }
+
+  /**
+   * Creates an y axis.
+   * @param  {string}  type  the type of the axis
+   * @param  {d3.scale}  scale the d3 scale object
+   * @return {d3.axis} the d3 axis object
+   */
+  static createYAxis(type, scale) {
+    let tickFormatter;
+    if (type === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
     } else {
       tickFormatter = s => s;
     }
-    const y = axisRight(scaleY).tickFormat(tickFormatter);
-    return [x, y];
+    const y = axisRight(scale).tickFormat(tickFormatter);
+    return y;
   }
 
 }
