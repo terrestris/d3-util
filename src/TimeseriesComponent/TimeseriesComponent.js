@@ -166,6 +166,12 @@ class TimeseriesComponent {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScaleX);
         this.mainScaleY = transform.rescaleY(this.originalScaleY);
+        if (this.config.zoomMode === 'transform') {
+          root.selectAll('.x-axis').remove();
+          root.selectAll('.y-axis').remove();
+          root.selectAll('circle,line')
+            .attr('transform', transform);
+        }
         this.render(root, size, true);
       });
     root.append('rect')
@@ -185,7 +191,7 @@ class TimeseriesComponent {
    * @param  {boolean} rerender if true, rerendering mode is enabled
    */
   render(root, size, rerender) {
-    if (rerender) {
+    if (rerender && this.config.zoomMode !== 'transform') {
       root.selectAll('g.timeseries').remove();
     }
     const g = root.append('g').attr('class', 'timeseries');
@@ -205,6 +211,9 @@ class TimeseriesComponent {
     const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
     const x = rerender ? this.mainScaleX : this.createScale(this.config.scaleX, size[0] - width, xData, false);
     this.config.series.forEach((line, idx) => {
+      if (rerender && this.config.zoomMode === 'transform') {
+        return;
+      }
       const y = yScales[idx];
       const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
       const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
