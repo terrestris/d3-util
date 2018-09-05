@@ -165,7 +165,7 @@ class TimeseriesComponent {
       .on('zoom', () => {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScaleX);
-        this.mainScaleY = transform.rescaleY(this.originalScaleY);
+        this.yScales = this.originalYScales.map(scale => transform.rescaleY(scale));
         if (this.config.zoomMode === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
@@ -198,8 +198,8 @@ class TimeseriesComponent {
     const yScales = [];
     this.config.series.forEach((line, idx) => {
       let y = this.createScale(line.scaleY, size[1], line.data.filter(d => d).map(d => d[1]), true);
-      if (rerender && idx === 0) {
-        y = this.mainScaleY;
+      if (rerender) {
+        y = this.yScales[idx];
       }
       yScales.push(y);
       if (line.drawAxis) {
@@ -221,12 +221,12 @@ class TimeseriesComponent {
       this.renderLine(lineg, line, idx, x, y);
     });
     this.drawXAxis(x, g, size, width);
-    this.mainScaleY = yScales[0];
+    this.yScales = yScales;
     this.mainScaleX = x;
     if (!rerender) {
       this.enableZoom(root, size);
       this.originalScaleX = x;
-      this.originalScaleY = yScales[0];
+      this.originalYScales = yScales;
     }
   }
 
