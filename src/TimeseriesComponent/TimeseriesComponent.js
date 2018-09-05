@@ -170,7 +170,7 @@ class TimeseriesComponent {
         if (this.config.zoomMode === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
-          root.selectAll('circle,line')
+          root.selectAll('circle,path')
             .attr('transform', transform);
         }
         this.render(root, size, true);
