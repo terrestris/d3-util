@@ -12,14 +12,21 @@ class ChartDataUtil {
   static lineDataFromPointData(data) {
     const lineData = [];
     let last;
+    let line = [];
     data.forEach(d => {
       if (d !== undefined && last !== undefined) {
-        lineData.push([last[0], last[1], d[0], d[1]]);
+        line.push(last);
       } else {
-        lineData.push(undefined);
+        if (line.length > 1) {
+          lineData.push(line);
+        }
+        line = [];
       }
       last = d;
     });
+    if (line.length > 1) {
+      lineData.push(line);
+    }
     return lineData;
   }
 

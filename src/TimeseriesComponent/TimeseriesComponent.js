@@ -5,6 +5,7 @@ import scaleLinear from 'd3-scale/src/linear';
 import scaleTime from 'd3-scale/src/time';
 import zoom from 'd3-zoom/src/zoom';
 import {event} from 'd3-selection/src/selection/on';
+import d3line from 'd3-shape/src/line.js';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -85,18 +86,18 @@ class TimeseriesComponent {
    */
   renderLine(g, line, idx, x, y) {
     const lineData = ChartDataUtil.lineDataFromPointData(line.data);
+    lineData.forEach(data => {
+      const generator = d3line()
+        .x(d => x(d[0]))
+        .y(d => y(d[1]));
 
-    g.selectAll(`line.series-${idx}`)
-      .data(lineData)
-      .enter()
-      .filter(d => d)
-      .append('line')
-      .attr('class', `series-${idx}`)
-      .attr('x1', d => x(d[0]))
-      .attr('y1', d => y(d[1]))
-      .attr('x2', d => x(d[2]))
-      .attr('y2', d => y(d[3]))
-      .style('stroke', line.color);
+      g.append('path')
+        .datum(data)
+        .attr('d', generator)
+        .attr('class', `series-${idx}`)
+        .style('fill', 'none')
+        .style('stroke', line.color);
+    });
   }
 
   /**
