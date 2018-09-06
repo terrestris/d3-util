@@ -6,6 +6,7 @@ import scaleTime from 'd3-scale/src/time';
 import zoom from 'd3-zoom/src/zoom';
 import {event} from 'd3-selection/src/selection/on';
 import d3line from 'd3-shape/src/line.js';
+import d3tip from 'd3-tip';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -64,6 +65,10 @@ class TimeseriesComponent {
    * @param  {d3.scale} y the y scale
    */
   renderDots(g, line, idx, x, y) {
+    const tip = d3tip().attr('class', 'd3-tip').html(d => d[1]);
+
+    g.call(tip);
+
     g.selectAll(`circle.series-${idx}`)
       .data(line.data)
       .enter()
@@ -73,7 +78,9 @@ class TimeseriesComponent {
       .attr('cx', d => x(d[0]))
       .attr('cy', d => y(d[1]))
       .attr('r', '5px')
-      .attr('fill', line.color);
+      .attr('fill', line.color)
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide);
   }
 
   /**
@@ -133,10 +140,20 @@ class TimeseriesComponent {
     const prevAxes = selection.selectAll('.y-axis').nodes();
     const width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
 
-    selection.append('g')
+    const axis = selection.append('g')
       .attr('class', 'y-axis')
       .attr('transform', `translate(${width}, 0)`)
       .call(yAxis);
+    if (series.yAxisLabel) {
+      axis.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -300)
+        .attr('y', -20)
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .style('fill', 'black')
+        .text(series.yAxisLabel);
+    }
   }
 
   /**
@@ -175,14 +192,7 @@ class TimeseriesComponent {
         }
         this.render(root, size, true);
       });
-    root.append('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', size[0])
-      .attr('height', size[1])
-      .style('fill', 'none')
-      .style('pointer-events', 'all')
-      .call(this.zoomBehaviour);
+    root.call(this.zoomBehaviour);
   }
 
   /**
