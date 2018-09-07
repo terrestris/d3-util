@@ -151,7 +151,7 @@ class TimeseriesComponent {
         .attr('y', -20)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .style('fill', 'black')
+        .style('fill', series.color)
         .text(series.yAxisLabel);
     }
   }
