@@ -134,7 +134,7 @@ class TimeseriesComponent {
    * @param  {selection} selection the d3 selection to append the axes to
    * @param  {number[]} size the chart size
    */
-  drawYAxis(y, series, selection) {
+  drawYAxis(y, series, selection, size) {
     const yAxis = AxesUtil.createYAxis(series.scaleY, y);
 
     const prevAxes = selection.selectAll('.y-axis').nodes();
@@ -147,7 +147,7 @@ class TimeseriesComponent {
     if (series.yAxisLabel) {
       axis.append('text')
         .attr('transform', 'rotate(-90)')
-        .attr('x', -300)
+        .attr('x', -size[1] / 2)
         .attr('y', -20)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
