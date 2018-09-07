@@ -18,7 +18,8 @@
   "homepage": "https://github.com/terrestris/d3-util#readme",
   "dependencies": {},
   "peerDependencies": {
-    "d3": "~5"
+    "d3": "~5",
+    "d3-tip": "0.9.1"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
@@ -36,6 +37,7 @@
     "babel-preset-stage-0": "6.24.1",
     "coveralls": "3.0.2",
     "d3": "5.7.0",
+    "d3-tip": "0.9.1",
     "jest": "23.5.0",
     "moment": "2.22.2",
     "np": "3.0.4",
