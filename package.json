@@ -4,7 +4,9 @@
   "description": "A set of helper classes for working with d3 charts.",
   "main": "src/index.js",
   "scripts": {
-    "release": "np --no-yarn"
+    "release": "np --no-yarn",
+    "clean:dist": "rimraf ./dist/*",
+    "build:dist": "npm run clean:dist && webpack"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,7 @@
     "babel-core": "6.26.3",
     "babel-eslint": "9.0.0",
     "babel-jest": "23.4.2",
-    "babel-loader": "8.0.0",
+    "babel-loader": "7.1.5",
     "babel-plugin-dynamic-import-node": "2.1.0",
     "babel-plugin-import": "1.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.2",
@@ -41,6 +43,9 @@
     "jest": "23.5.0",
     "moment": "2.22.2",
     "np": "3.0.4",
+    "rimraf": "2.6.2",
+    "webpack": "4.19.1",
+    "webpack-cli": "3.1.1",
     "whatwg-fetch": "2.0.4"
   }
 }
