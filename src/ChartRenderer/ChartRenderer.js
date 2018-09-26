@@ -51,7 +51,7 @@ class ChartRenderer {
 
     const svg = this.createSvgRoot(element);
 
-    components.forEach(component => component.render(svg, [size[0] - 20, size[1] - 20]));
+    components.forEach(component => component.render(svg, size));
   }
 
 }

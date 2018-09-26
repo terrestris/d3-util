@@ -20,6 +20,7 @@ class TimeseriesComponent {
     backgroundColor: null,
     startDate: null,
     endDate: null,
+    size: [100, 100],
     chartMargin: {
       top: null,
       right: null,
@@ -187,7 +188,7 @@ class TimeseriesComponent {
         if (this.config.zoomMode === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
-          root.selectAll('circle,path')
+          root.selectAll('.timeseries circle,.timeseries path')
             .attr('transform', transform);
         }
         this.render(root, size, true);
@@ -202,25 +203,29 @@ class TimeseriesComponent {
    * @param  {boolean} rerender if true, rerendering mode is enabled
    */
   render(root, size, rerender) {
-    if (rerender && this.config.zoomMode !== 'transform') {
-      root.selectAll('g.timeseries').remove();
+    let g = root.selectAll('g.timeseries');
+    if (!g.node()) {
+      g = root.append('g').attr('class', 'timeseries');
     }
-    const g = root.append('g').attr('class', 'timeseries');
+    if (rerender && this.config.zoomMode !== 'transform') {
+      g.remove();
+      g = root.append('g').attr('class', 'timeseries');
+    }
     const yScales = [];
     this.config.series.forEach((line, idx) => {
-      let y = this.createScale(line.scaleY, size[1], line.data.filter(d => d).map(d => d[1]), true);
+      let y = this.createScale(line.scaleY, this.config.size[1], line.data.filter(d => d).map(d => d[1]), true);
       if (rerender) {
         y = this.yScales[idx];
       }
       yScales.push(y);
       if (line.drawAxis) {
-        this.drawYAxis(y, line, g, size);
+        this.drawYAxis(y, line, g, this.config.size);
       }
     });
     const axes = g.selectAll('.y-axis').nodes();
     const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
     const xData = this.config.series.reduce((acc, line) => acc.concat(line.data.filter(d => d).map(d => d[0])), []);
-    const x = rerender ? this.mainScaleX : this.createScale(this.config.scaleX, size[0] - width, xData, false);
+    const x = rerender ? this.mainScaleX : this.createScale(this.config.scaleX, this.config.size[0] - width, xData, false);
     this.config.series.forEach((line, idx) => {
       if (rerender && this.config.zoomMode === 'transform') {
         return;
@@ -231,11 +236,11 @@ class TimeseriesComponent {
       this.renderDots(dotsg, line, idx, x, y);
       this.renderLine(lineg, line, idx, x, y);
     });
-    this.drawXAxis(x, g, size, width);
+    this.drawXAxis(x, g, this.config.size, width);
     this.yScales = yScales;
     this.mainScaleX = x;
     if (!rerender) {
-      this.enableZoom(root, size);
+      this.enableZoom(root, this.config.size);
       this.originalScaleX = x;
       this.originalYScales = yScales;
     }
