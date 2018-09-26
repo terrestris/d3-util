@@ -1,4 +1,6 @@
 import extent from 'd3-array/src/extent';
+import scaleLinear from 'd3-scale/src/linear';
+import scaleTime from 'd3-scale/src/time';
 
 /**
  * Helper functions to create d3 scales.
@@ -64,6 +66,44 @@ class ScaleUtil {
     if (makeDomainNice) {
       domain.nice();
     }
+  }
+
+  /**
+   * Create the scales for a timeseries configuration.
+   * @param  {Object} config a timeseries component configuration
+   * @return {Object} a map mapping axis keys to scales. The special key XSCALE
+   * maps to the x scale (only one really makes sense in a timeseries)
+   */
+  static createScales(config) {
+    const scaleData = {};
+    config.series.forEach(line => {
+      line.axes.forEach(axis => {
+        if (!scaleData[axis]) {
+          scaleData[axis] = [];
+        }
+        scaleData[axis] = scaleData[axis].concat(line.data.map(d => {
+          return config.axes[axis].orientation === 'x' ? d[0] : d[1];
+        }));
+      });
+    });
+    let xscale;
+    const scales = {};
+    Object.entries(scaleData).map(([axis, data]) => {
+      let scale;
+      switch (config.axes[axis].scale) {
+        case 'linear': scale = scaleLinear();
+          break;
+        case 'time': scale = scaleTime();
+      }
+      if (config.axes[axis].orientation === 'x') {
+        xscale = scale;
+      }
+      ScaleUtil.setDomainForScale(config.axes[axis], scale, data.filter(d => d),
+        config.axes[axis].orientation === 'y');
+      scales[axis] = scale;
+    });
+    scales.XSCALE = xscale;
+    return scales;
   }
 
 }
