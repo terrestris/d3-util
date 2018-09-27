@@ -12,6 +12,8 @@ import d3tip from 'd3-tip';
  */
 class TimeseriesComponent {
 
+  static counter = 0;
+
   config = {
     series: [],
     zoomEnabled: true,
@@ -180,12 +182,33 @@ class TimeseriesComponent {
         if (zoomType === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
-          root.selectAll('.timeseries circle,.timeseries path')
+          root.selectAll('.timeseries-chart')
             .attr('transform', transform);
         }
         this.render(root, this.config.size, true);
       });
+
     root.call(this.zoomBehaviour);
+  }
+
+  /**
+   * Append a clipping rect. this.clipId will contain the clipPath's id.
+   * @param  {d3.selection} root svg node to append the clip rect to
+   * @param  {Number} x where to start clipping
+   * @param  {Number} y where to start clipping
+   * @param  {Number} width where to end clipping
+   * @param  {Number} height where to end clipping
+   */
+  appendClipRect(root, x, y, width, height) {
+    this.clipId = `clip-path-${++TimeseriesComponent.counter}`;
+    root.append('defs')
+      .append('clipPath')
+      .attr('id', this.clipId)
+      .append('rect')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('width', width)
+      .attr('height', height);
   }
 
   /**
@@ -199,21 +222,31 @@ class TimeseriesComponent {
       // refuse to render chart without series
       return;
     }
+
     let g = root.selectAll('g.timeseries');
-    if (!g.node()) {
-      g = root.append('g').attr('class', 'timeseries');
-    }
-    if (rerender && this.zoomType !== 'transform') {
+    let chartRoot = g.selectAll('g.timeseries-chart');
+    if (g.node() && rerender && this.zoomType !== 'transform') {
       g.remove();
+      root.selectAll(`#${this.clipId}`).remove();
+    }
+    const needRecreate = !g.node();
+    if (needRecreate) {
       g = root.append('g').attr('class', 'timeseries');
+      const clip = g.append('g').attr('class', 'timeseries-clip');
+      chartRoot = clip.append('g').attr('class', 'timeseries-chart');
     }
 
     const yScales = this.prepareYAxes(rerender, g);
     const axes = g.selectAll('.y-axis').nodes();
     const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
     const x = rerender ? this.mainScaleX : this.originalScales.XSCALE.range([0, this.config.size[0] - width]);
+    if (needRecreate) {
+      this.appendClipRect(root, width, 0, this.config.size[0] - width, this.config.size[1]);
+      root.select('.timeseries-clip')
+        .attr('clip-path', `url(#${this.clipId})`);
+    }
 
-    this.renderSeries(rerender, g, x, yScales, width);
+    this.renderSeries(rerender, chartRoot, x, yScales, width);
     this.drawXAxis(x, g, this.config.size, width);
 
     this.yScales = yScales;
