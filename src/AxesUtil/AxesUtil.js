@@ -12,6 +12,7 @@ import {
   timeYear
 } from 'd3-time';
 import {axisBottom, axisRight} from 'd3-axis';
+import {format} from 'd3-format';
 
 /**
  * Class with helper functions to create/manage chart axes.
@@ -51,14 +52,16 @@ class AxesUtil {
 
   /**
    * Create an x axis.
-   * @param  {string}  type  the type of the axis
-   * @param  {d3.scale}  scale the d3 scale object
+   * @param  {Object} config the axis configuration
+   * @param {d3.scale} scale the d3 scale object
    * @return {d3.axis} the d3 axis object
    */
-  static createXAxis(type, scale) {
+  static createXAxis(config, scale) {
     let tickFormatter;
-    if (type === 'time') {
+    if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
+    } else if (config.format) {
+      tickFormatter = format(config.format);
     } else {
       tickFormatter = s => s;
     }
@@ -68,14 +71,16 @@ class AxesUtil {
 
   /**
    * Creates an y axis.
-   * @param  {string}  type  the type of the axis
-   * @param  {d3.scale}  scale the d3 scale object
+   * @param  {Object} config the axis configuration
+   * @param  {d3.scale} scale the d3 scale object
    * @return {d3.axis} the d3 axis object
    */
-  static createYAxis(type, scale) {
+  static createYAxis(config, scale) {
     let tickFormatter;
-    if (type === 'time') {
+    if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
+    } else if (config.format) {
+      tickFormatter = format(config.format);
     } else {
       tickFormatter = s => s;
     }

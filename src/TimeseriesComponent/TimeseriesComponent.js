@@ -109,7 +109,7 @@ class TimeseriesComponent {
    * @param  {number[]} size the chart size
    */
   drawYAxis(y, series, selection, size) {
-    const yAxis = AxesUtil.createYAxis(this.config.axes[series.axes[1]].scale, y);
+    const yAxis = AxesUtil.createYAxis(this.config.axes[series.axes[1]], y);
 
     const prevAxes = selection.selectAll('.y-axis').nodes();
     const width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
@@ -138,7 +138,8 @@ class TimeseriesComponent {
    * @param  {number} width the x offset to draw the chart at
    */
   drawXAxis(x, selection, size, width) {
-    const xAxis = AxesUtil.createXAxis('time', x);
+    const config = Object.entries(this.config.axes).find(entry => entry[1].orientation === 'x')[1];
+    const xAxis = AxesUtil.createXAxis(config, x);
 
     selection.append('g')
       .attr('transform', `translate(${width}, ${size[1]})`)
