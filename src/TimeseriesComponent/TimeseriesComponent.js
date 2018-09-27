@@ -109,24 +109,35 @@ class TimeseriesComponent {
    * @param  {number[]} size the chart size
    */
   drawYAxis(y, series, selection, size) {
-    const yAxis = AxesUtil.createYAxis(this.config.axes[series.axes[1]], y);
+    const config = this.config.axes[series.axes[1]];
+    const yAxis = AxesUtil.createYAxis(config, y);
 
     const prevAxes = selection.selectAll('.y-axis').nodes();
-    const width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
+    let width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
+    if (config.labelSize) {
+      width += config.labelSize;
+    } else if (config.label) {
+      width += 13;
+    }
+    if (config.labelPadding) {
+      width += config.labelPadding;
+    }
 
     const axis = selection.append('g')
       .attr('class', 'y-axis')
       .attr('transform', `translate(${width}, 0)`)
       .call(yAxis);
-    if (series.yAxisLabel) {
+    if (config.label) {
       axis.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('x', -size[1] / 2)
         .attr('y', -20)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .style('fill', series.color)
-        .text(series.yAxisLabel);
+        .style('padding', config.labelPadding)
+        .style('font-size', config.labelSize || 13)
+        .style('fill', config.labelColor)
+        .text(config.label);
     }
   }
 
