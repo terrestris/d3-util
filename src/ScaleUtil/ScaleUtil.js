@@ -81,9 +81,11 @@ class ScaleUtil {
         if (!scaleData[axis]) {
           scaleData[axis] = [];
         }
-        scaleData[axis] = scaleData[axis].concat(line.data.map(d => {
-          return config.axes[axis].orientation === 'x' ? d[0] : d[1];
-        }));
+        scaleData[axis] = scaleData[axis].concat(line.data
+          .filter(d => d)
+          .map(d => {
+            return config.axes[axis].orientation === 'x' ? d[0] : d[1];
+          }));
       });
     });
     let xscale;
