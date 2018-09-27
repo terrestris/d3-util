@@ -10,64 +10,39 @@ class LegendComponent {
     LEGEND_ICON_LINE: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6'
   }
 
-  config = {
-    items: [{
-      title: 'Label',
-      type: 'line',
-      color: '#ff0000',
-      width: 1
-    }, {
-      title: 'Label 2',
-      type: 'area',
-      color: '#ff0000',
-    }, {
-      title: 'Label 3',
-      type: 'bar',
-      color: '#ff0000',
-      width: 1
-    }]
-  }
-
   /**
    * Constructs a new legend component.
    * @param {Object} config the legend configuration
    */
   constructor(config) {
     this.config = config;
+    // just ignore legend items w/o type
+    config.items = config.items.filter(item => item.type);
+  }
+
+  /**
+   * Apply the style properties.
+   * @param  {Object} style the style properties
+   * @param  {d3.selection} node the node to apply the properties to
+   */
+  applyStyle(style, node) {
+    Object.entries(style).forEach(([prop, value]) => {
+      node.style(prop, value);
+    });
   }
 
   constructLegendElement = (item, idx, g) => {
     const leg = g.append('g')
       .attr('transform', `translate(0, ${idx * 20})`);
-    leg.append('path')
+    const path = leg.append('path')
       .attr('d', () => {
         const typeUppercase = item.type.toUpperCase();
         return this.SVG_DEFS['LEGEND_ICON_' + typeUppercase];
       })
-      .style('stroke', () => {
-        switch (item.type) {
-          case 'line':
-            return item.color;
-          default:
-            return 'none';
-        }
-      })
-      .style('stroke-width', () => {
-        switch (item.type) {
-          case 'line':
-            return item.width;
-          default:
-            return 0;
-        }
-      })
-      .style('fill', () => {
-        switch (item.type) {
-          case 'line':
-            return 'none';
-          default:
-            return item.color;
-        }
-      });
+      .style('stroke', 'none')
+      .style('fill', 'none');
+    this.applyStyle(item.style, path);
+
     g.append('path')
       .attr('d', this.SVG_DEFS.LEGEND_ICON_BACKGROUND)
       .style('stroke', 'none')
@@ -81,6 +56,10 @@ class LegendComponent {
 
     g.append('title')
       .text(item.title);
+
+    if (item.customRenderer instanceof Function) {
+      item.customRenderer(g);
+    }
   }
 
   /**
