@@ -51,12 +51,13 @@ class AxesUtil {
   }
 
   /**
-   * Create an x axis.
-   * @param  {Object} config the axis configuration
+   * Create an axis.
+   * @param {Object} config the axis configuration
    * @param {d3.scale} scale the d3 scale object
-   * @return {d3.axis} the d3 axis object
+   * @param {Function} axisFunc the axis function to create
+   * @return {Boolean} the d3 axis object
    */
-  static createXAxis(config, scale) {
+  static createAxis(config, scale, axisFunc) {
     let tickFormatter;
     if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
@@ -65,8 +66,23 @@ class AxesUtil {
     } else {
       tickFormatter = s => s;
     }
-    const x = axisBottom(scale).tickFormat(tickFormatter);
+    const x = axisFunc(scale)
+      .ticks(config.ticks)
+      .tickValues(config.tickValues)
+      .tickFormat(tickFormatter)
+      .tickSize(config.tickSize || 6)
+      .tickPadding(config.tickPadding || 3);
     return x;
+  }
+
+  /**
+   * Create an x axis.
+   * @param  {Object} config the axis configuration
+   * @param {d3.scale} scale the d3 scale object
+   * @return {d3.axis} the d3 axis object
+   */
+  static createXAxis(config, scale) {
+    return this.createAxis(config, scale, axisBottom);
   }
 
   /**
@@ -76,16 +92,7 @@ class AxesUtil {
    * @return {d3.axis} the d3 axis object
    */
   static createYAxis(config, scale) {
-    let tickFormatter;
-    if (config.scale === 'time') {
-      tickFormatter = this.getMultiScaleTimeFormatter;
-    } else if (config.format) {
-      tickFormatter = format(config.format);
-    } else {
-      tickFormatter = s => s;
-    }
-    const y = axisRight(scale).tickFormat(tickFormatter);
-    return y;
+    return this.createAxis(config, scale, axisRight);
   }
 
 }
