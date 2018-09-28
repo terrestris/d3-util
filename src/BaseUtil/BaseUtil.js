@@ -16,7 +16,7 @@ class BaseUtil {
         .attr('height', config.size[1])
         .style('fill', config.backgroundColor);
     }
-    if (this.config.title) {
+    if (config.title) {
       root.append('text')
         .attr('x', size[0] / 2)
         .attr('y', parseInt(config.titlePadding) + parseInt(config.titleSize || 20))

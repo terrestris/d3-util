@@ -189,10 +189,18 @@ class TimeseriesComponent {
     const config = Object.values(this.config.axes).find(item => item.orientation === 'x');
     const xAxis = AxesUtil.createXAxis(config, x);
 
-    selection.insert('g', ':first-child')
+    const axis = selection.insert('g', ':first-child')
       .attr('transform', `translate(${width}, ${size[1]})`)
       .attr('class', 'x-axis')
       .call(xAxis);
+
+    if (config.labelRotation) {
+      axis.selectAll('text')
+        .attr('transform', `rotate(${config.labelRotation})`)
+        .attr('dx', '-10px')
+        .attr('dy', '1px')
+        .style('text-anchor', 'end');
+    }
 
     if (config.showGrid) {
       const gridAxis = AxesUtil.createXAxis(config, x);
