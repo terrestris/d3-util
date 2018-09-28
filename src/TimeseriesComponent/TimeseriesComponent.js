@@ -1,6 +1,7 @@
 import ChartDataUtil from '../ChartDataUtil/ChartDataUtil';
 import ScaleUtil from '../ScaleUtil/ScaleUtil';
 import AxesUtil from '../AxesUtil/AxesUtil';
+import BaseUtil from '../BaseUtil/BaseUtil';
 import zoom from 'd3-zoom/src/zoom';
 import {event} from 'd3-selection/src/selection/on';
 import d3line from 'd3-shape/src/line.js';
@@ -301,25 +302,7 @@ class TimeseriesComponent {
     this.yScales = yScales;
     this.mainScaleX = x;
 
-    if (this.config.backgroundColor && !rerender) {
-      root.insert('rect', ':first-child')
-        .attr('class', 'timeseries-background')
-        .attr('x', width)
-        .attr('y', 0)
-        .attr('width', this.config.size[0] - width)
-        .attr('height', this.config.size[1])
-        .style('fill', this.config.backgroundColor);
-    }
-    if (this.config.title && !rerender) {
-      root.append('text')
-        .attr('x', size[0] / 2)
-        .attr('y', parseInt(this.config.titlePadding) + parseInt(this.config.titleSize || 20))
-        .attr('class', 'timeseries-title')
-        .style('text-anchor', 'middle')
-        .style('font-size', this.config.titleSize || 20)
-        .style('fill', this.config.titleColor)
-        .text(this.config.title);
-    }
+    BaseUtil.addCommonParts(root, width, this.config, size);
   }
 
   /**
