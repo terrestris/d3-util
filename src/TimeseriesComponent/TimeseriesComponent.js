@@ -104,6 +104,16 @@ class TimeseriesComponent {
   }
 
   /**
+   * Calculate the width of all currently visible axes.
+   * @param {d3.selection} node a node below which the axes are rendered
+   * @return {Number} the width of all axes
+   */
+  calculateAxesWidth(node) {
+    const axisElems = node.selectAll('.y-axes').nodes();
+    return axisElems.reduce((acc, node) => acc + node.getBBox().width, 0);
+  }
+
+  /**
    * Creates an d3 axis from the given scale.
    * @param  {d3.scale} y the y scale
    * @param  {object} series the series configuration
@@ -112,31 +122,29 @@ class TimeseriesComponent {
    */
   drawYAxis(y, series, selection, size) {
     const config = this.config.axes[series.axes[1]];
+    if (!config.display) {
+      return;
+    }
     const yAxis = AxesUtil.createYAxis(config, y);
 
-    const prevAxes = selection.selectAll('.y-axis').nodes();
-    let width = prevAxes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * prevAxes.length;
-    if (config.labelSize) {
-      width += config.labelSize;
-    } else if (config.label) {
-      width += 13;
-    }
+    let width = this.calculateAxesWidth(d3.select(selection.node().parentNode));
+    let pad = config.labelSize || 13;
     if (config.labelPadding) {
-      width += config.labelPadding;
+      pad += config.labelPadding;
     }
 
     const axis = selection.append('g')
       .attr('class', 'y-axis')
-      .attr('transform', `translate(${width}, 0)`)
+      .attr('transform', `translate(${width}, 0)`);
+    axis.append('g')
+      .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
     if (config.label) {
       axis.append('text')
-        .attr('transform', 'rotate(-90)')
+        .attr('transform', `translate(0, 0) rotate(-90)`)
         .attr('x', -size[1] / 2)
-        .attr('y', -20)
-        .attr('dy', '1em')
+        .attr('y', config.labelSize || 13)
         .style('text-anchor', 'middle')
-        .style('padding', config.labelPadding)
         .style('font-size', config.labelSize || 13)
         .style('fill', config.labelColor)
         .text(config.label);
@@ -229,6 +237,7 @@ class TimeseriesComponent {
       g.remove();
       root.selectAll(`#${this.clipId}`).remove();
     }
+    root.selectAll('.y-axes').remove();
     const needRecreate = !g.node();
     if (needRecreate) {
       g = root.append('g').attr('class', 'timeseries');
@@ -237,8 +246,7 @@ class TimeseriesComponent {
     }
 
     const yScales = this.prepareYAxes(rerender, g);
-    const axes = g.selectAll('.y-axis').nodes();
-    const width = axes.reduce((acc, node) => acc + node.getBBox().width, 0) + 5 * axes.length;
+    const width = this.calculateAxesWidth(g);
     const x = rerender ? this.mainScaleX : this.originalScales.XSCALE.range([0, this.config.size[0] - width]);
     if (needRecreate) {
       this.appendClipRect(root, width, 0, this.config.size[0] - width, this.config.size[1]);
@@ -281,6 +289,7 @@ class TimeseriesComponent {
   prepareYAxes(rerender, g) {
     const yScales = [];
     const yAxesDrawn = [];
+    g = g.append('g').attr('class', 'y-axes');
     this.config.series.forEach((line, idx) => {
       let y = this.originalScales[line.axes[1]];
       y.range([10, this.config.size[1] - 10]);

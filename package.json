@@ -7,7 +7,8 @@
     "release": "np --no-yarn",
     "clean:dist": "rimraf ./dist/*",
     "build:dist": "npm run clean:dist && webpack",
-    "build:dev": "npm run clean:dist && webpack --mode=development"
+    "build:dev": "npm run clean:dist && webpack --mode=development",
+    "start:dev": "npm run clean:dist && webpack --mode=development --watch"
   },
   "repository": {
     "type": "git",
