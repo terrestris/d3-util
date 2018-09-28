@@ -300,6 +300,15 @@ class TimeseriesComponent {
 
     this.yScales = yScales;
     this.mainScaleX = x;
+
+    if (this.config.backgroundColor) {
+      root.insert('rect', ':first-child')
+        .attr('x', width)
+        .attr('y', 0)
+        .attr('width', this.config.size[0] - width)
+        .attr('height', this.config.size[1])
+        .style('fill', this.config.backgroundColor);
+    }
   }
 
   /**
