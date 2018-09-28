@@ -294,6 +294,7 @@ class TimeseriesComponent {
       const clip = g.append('g').attr('class', 'timeseries-clip');
       chartRoot = clip.append('g').attr('class', 'timeseries-chart');
     }
+    g.attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
     const yScales = this.prepareYAxes(rerender, g);
     const width = this.calculateAxesWidth(g);
@@ -310,7 +311,10 @@ class TimeseriesComponent {
     this.yScales = yScales;
     this.mainScaleX = x;
 
-    BaseUtil.addCommonParts(root, width, this.config, size);
+    if (needRecreate) {
+      BaseUtil.addBackground(g, width, this.config);
+      BaseUtil.addTitle(root, this.config, size);
+    }
   }
 
   /**

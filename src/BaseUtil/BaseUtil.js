@@ -4,9 +4,12 @@
 class BaseUtil {
 
   /**
-   * Adds common parts like title and background color.
+   * Adds background color.
+   * @param {d3.selection} root to render the background rect to
+   * @param {Number} offset the x offset to use
+   * @param {Object} config the chart config object
    */
-  static addCommonParts(root, offset, config, size) {
+  static addBackground(root, offset, config) {
     if (config.backgroundColor) {
       root.insert('rect', ':first-child')
         .attr('class', 'timeseries-background')
@@ -16,6 +19,15 @@ class BaseUtil {
         .attr('height', config.size[1])
         .style('fill', config.backgroundColor);
     }
+  }
+
+  /**
+   * Adds a title.
+   * @param {d3.selection} root the node to render the title on
+   * @param {Object} config the chart config object
+   * @param {Number[]} size the size of the chart
+   */
+  static addTitle(root, config, size) {
     if (config.title) {
       root.append('text')
         .attr('x', size[0] / 2)
