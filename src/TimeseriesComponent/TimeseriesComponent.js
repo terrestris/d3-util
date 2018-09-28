@@ -141,7 +141,7 @@ class TimeseriesComponent {
       .call(yAxis);
     if (config.label) {
       axis.append('text')
-        .attr('transform', `translate(0, 0) rotate(-90)`)
+        .attr('transform', `rotate(-90)`)
         .attr('x', -size[1] / 2)
         .attr('y', config.labelSize || 13)
         .style('text-anchor', 'middle')
