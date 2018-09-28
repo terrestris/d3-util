@@ -301,13 +301,24 @@ class TimeseriesComponent {
     this.yScales = yScales;
     this.mainScaleX = x;
 
-    if (this.config.backgroundColor) {
+    if (this.config.backgroundColor && !rerender) {
       root.insert('rect', ':first-child')
+        .attr('class', 'timeseries-background')
         .attr('x', width)
         .attr('y', 0)
         .attr('width', this.config.size[0] - width)
         .attr('height', this.config.size[1])
         .style('fill', this.config.backgroundColor);
+    }
+    if (this.config.title && !rerender) {
+      root.append('text')
+        .attr('x', size[0] / 2)
+        .attr('y', parseInt(this.config.titlePadding) + parseInt(this.config.titleSize || 20))
+        .attr('class', 'timeseries-title')
+        .style('text-anchor', 'middle')
+        .style('font-size', this.config.titleSize || 20)
+        .style('fill', this.config.titleColor)
+        .text(this.config.title);
     }
   }
 
