@@ -311,8 +311,8 @@ class TimeseriesComponent {
     this.yScales = yScales;
     this.mainScaleX = x;
 
+    BaseUtil.addBackground(g, width, this.config);
     if (needRecreate) {
-      BaseUtil.addBackground(g, width, this.config);
       BaseUtil.addTitle(root, this.config, size);
     }
   }

@@ -11,6 +11,7 @@ class BaseUtil {
    */
   static addBackground(root, offset, config) {
     if (config.backgroundColor) {
+      root.select('.timeseries-background').remove();
       root.insert('rect', ':first-child')
         .attr('class', 'timeseries-background')
         .attr('x', offset)
