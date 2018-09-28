@@ -1,6 +1,7 @@
 import extent from 'd3-array/src/extent';
 import scaleLinear from 'd3-scale/src/linear';
 import scaleTime from 'd3-scale/src/time';
+import scaleLog from 'd3-scale/src/log';
 
 /**
  * Helper functions to create d3 scales.
@@ -96,6 +97,8 @@ class ScaleUtil {
         case 'linear': scale = scaleLinear();
           break;
         case 'time': scale = scaleTime();
+          break;
+        case 'log': scale = scaleLog();
       }
       if (config.axes[axis].orientation === 'x') {
         xscale = scale;
