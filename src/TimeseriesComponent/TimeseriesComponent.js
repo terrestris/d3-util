@@ -152,6 +152,32 @@ class TimeseriesComponent {
   }
 
   /**
+   * Draws a y grid axis.
+   * @param {d3.scale} y the y scale
+   * @param {Object} config the axis configuration
+   * @param {d3.selection} selection to append the grid to
+   * @param {Number[]} size the chart size
+   */
+  drawYGridAxis(y, config, selection, size) {
+    if (!config.display || !config.showGrid) {
+      return;
+    }
+    let width = this.calculateAxesWidth(d3.select(selection.node().parentNode));
+    const gridAxis = AxesUtil.createYAxis(config, y);
+    gridAxis
+      .tickFormat('')
+      .tickSize(size[0] - width);
+    selection.append('g')
+      .attr('transform', `translate(${width}, 0)`)
+      .attr('class', 'y-axis')
+      .style('stroke-width', config.gridWidth || 1)
+      .style('color', config.gridColor || '#d3d3d3')
+      .style('stroke', config.gridColor || '#d3d3d3')
+      .style('stroke-opacity', config.gridOpacity || 0.7)
+      .call(gridAxis);
+  }
+
+  /**
    * Creates the x axis for a chart.
    * @param  {d3.scale} x the d3 scale
    * @param  {d3.selection} selection the d3 selection to add the axis to
@@ -159,13 +185,28 @@ class TimeseriesComponent {
    * @param  {number} width the x offset to draw the chart at
    */
   drawXAxis(x, selection, size, width) {
-    const config = Object.entries(this.config.axes).find(entry => entry[1].orientation === 'x')[1];
+    const config = Object.values(this.config.axes).find(item => item.orientation === 'x');
     const xAxis = AxesUtil.createXAxis(config, x);
 
-    selection.append('g')
+    selection.insert('g', ':first-child')
       .attr('transform', `translate(${width}, ${size[1]})`)
       .attr('class', 'x-axis')
       .call(xAxis);
+
+    if (config.showGrid) {
+      const gridAxis = AxesUtil.createXAxis(config, x);
+      gridAxis
+        .tickFormat('')
+        .tickSize(-size[1]);
+      selection.insert('g', ':first-child')
+        .attr('transform', `translate(${width}, ${size[1]})`)
+        .attr('class', 'x-axis')
+        .style('stroke-width', config.gridWidth || 1)
+        .style('color', config.gridColor || '#d3d3d3')
+        .style('stroke', config.gridColor || '#d3d3d3')
+        .style('stroke-opacity', config.gridOpacity || 0.7)
+        .call(gridAxis);
+    }
   }
 
   /**
@@ -237,7 +278,7 @@ class TimeseriesComponent {
       g.remove();
       root.selectAll(`#${this.clipId}`).remove();
     }
-    root.selectAll('.y-axes').remove();
+    root.selectAll('.y-axes,.y-grid-axes').remove();
     const needRecreate = !g.node();
     if (needRecreate) {
       g = root.append('g').attr('class', 'timeseries');
@@ -254,8 +295,8 @@ class TimeseriesComponent {
         .attr('clip-path', `url(#${this.clipId})`);
     }
 
-    this.renderSeries(rerender, chartRoot, x, yScales, width);
     this.drawXAxis(x, g, this.config.size, width);
+    this.renderSeries(rerender, chartRoot, x, yScales, width);
 
     this.yScales = yScales;
     this.mainScaleX = x;
@@ -284,15 +325,17 @@ class TimeseriesComponent {
 
   /**
    * Prepares and renders y axis/scales.
+   * @param {Boolean} rerender whether we are in rerender mode
+   * @param {d3.selection} node the node to render the axes to
    * @return {Function[]} the y scales in order of the series
    */
-  prepareYAxes(rerender, g) {
+  prepareYAxes(rerender, node) {
     const yScales = [];
     const yAxesDrawn = [];
-    g = g.append('g').attr('class', 'y-axes');
+    let g = node.insert('g', ':first-child').attr('class', 'y-axes');
     this.config.series.forEach((line, idx) => {
       let y = this.originalScales[line.axes[1]];
-      y.range([10, this.config.size[1] - 10]);
+      y.range([0, this.config.size[1]]);
       if (rerender) {
         y = this.yScales[idx];
       }
@@ -301,6 +344,14 @@ class TimeseriesComponent {
         !yAxesDrawn.includes(line.axes[1])) {
         this.drawYAxis(y, line, g, this.config.size);
         yAxesDrawn.push(line.axes[1]);
+      }
+    });
+    g = node.insert('g', ':first-child').attr('class', 'y-grid-axes');
+    let idx = 0;
+    Object.values(this.config.axes).forEach(config => {
+      if (config.orientation === 'y') {
+        this.drawYGridAxis(yScales[idx], config, g, this.config.size);
+        ++idx;
       }
     });
     return yScales;
