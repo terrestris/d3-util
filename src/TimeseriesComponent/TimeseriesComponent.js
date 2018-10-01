@@ -234,9 +234,10 @@ class TimeseriesComponent {
       .on('zoom', () => {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScales.XSCALE);
-        this.yScales = Object.entries(this.originalScales)
+        this.yScales = {};
+        Object.entries(this.originalScales)
           .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
-          .map(entry => transform.rescaleY(entry[1]));
+          .forEach(([key, scale]) => this.yScales[key] = transform.rescaleY(scale));
         if (zoomType === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
@@ -330,7 +331,7 @@ class TimeseriesComponent {
       if (rerender && this.zoomType === 'transform') {
         return;
       }
-      const y = yScales[idx];
+      const y = yScales[line.axes[1]];
       const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
       const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
       this.renderDots(dotsg, line, idx, x, y);
@@ -345,16 +346,16 @@ class TimeseriesComponent {
    * @return {Function[]} the y scales in order of the series
    */
   prepareYAxes(rerender, node) {
-    const yScales = [];
+    const yScales = {};
     const yAxesDrawn = [];
     let g = node.insert('g', ':first-child').attr('class', 'y-axes');
-    this.config.series.forEach((line, idx) => {
+    this.config.series.forEach(line => {
       let y = this.originalScales[line.axes[1]];
       y.range([0, this.config.size[1]]);
       if (rerender) {
-        y = this.yScales[idx % this.yScales.length];
+        y = this.yScales[line.axes[1]];
       }
-      yScales.push(y);
+      yScales[line.axes[1]] = y;
       if (this.config.axes[line.axes[1]].display &&
         !yAxesDrawn.includes(line.axes[1])) {
         this.drawYAxis(y, line, g, this.config.size);
@@ -362,11 +363,9 @@ class TimeseriesComponent {
       }
     });
     g = node.insert('g', ':first-child').attr('class', 'y-grid-axes');
-    let idx = 0;
-    Object.values(this.config.axes).forEach(config => {
+    Object.entries(this.config.axes).forEach(([key, config]) => {
       if (config.orientation === 'y') {
-        this.drawYGridAxis(yScales[idx], config, g, this.config.size);
-        ++idx;
+        this.drawYGridAxis(yScales[key], config, g, this.config.size);
       }
     });
     return yScales;
