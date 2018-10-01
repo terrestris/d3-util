@@ -352,7 +352,7 @@ class TimeseriesComponent {
       let y = this.originalScales[line.axes[1]];
       y.range([0, this.config.size[1]]);
       if (rerender) {
-        y = this.yScales[idx];
+        y = this.yScales[idx % this.yScales.length];
       }
       yScales.push(y);
       if (this.config.axes[line.axes[1]].display &&
