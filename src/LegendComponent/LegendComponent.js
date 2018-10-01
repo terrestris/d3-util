@@ -33,7 +33,7 @@ class LegendComponent {
 
   constructLegendElement = (item, idx, g) => {
     const leg = g.append('g')
-      .attr('transform', `translate(0, ${idx * 20})`);
+      .attr('transform', `translate(0, ${(idx + 1) * 20})`);
     const path = leg.append('path')
       .attr('d', () => {
         const typeUppercase = item.type.toUpperCase();
@@ -43,18 +43,18 @@ class LegendComponent {
       .style('fill', 'none');
     this.applyStyle(item.style, path);
 
-    g.append('path')
+    leg.append('path')
       .attr('d', this.SVG_DEFS.LEGEND_ICON_BACKGROUND)
       .style('stroke', 'none')
       // invisible, but still triggering events
       .style('fill', 'rgba(0,0,0,0)');
-    g.append('text')
+    leg.append('text')
       .text(item.title)
       .attr('text-anchor', 'start')
       .attr('dy', '0')
       .attr('dx', '25');
 
-    g.append('title')
+    leg.append('title')
       .text(item.title);
 
     if (item.customRenderer instanceof Function) {
@@ -70,7 +70,7 @@ class LegendComponent {
   render(root) {
     const g = root.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(${this.config.position}, 20)`);
+      .attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
     this.config.items.forEach((item, idx) => this.constructLegendElement(item, idx, g));
   }
