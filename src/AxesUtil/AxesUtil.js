@@ -61,6 +61,9 @@ class AxesUtil {
     let tickFormatter;
     if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
+    } else if (config.scale === 'band') {
+      // a numeric format makes no sense here
+      tickFormatter = s => s;
     } else if (config.format) {
       tickFormatter = format(config.format);
     } else {
@@ -93,6 +96,66 @@ class AxesUtil {
    */
   static createYAxis(config, scale) {
     return this.createAxis(config, scale, axisRight);
+  }
+
+  /**
+   * Creates an d3 axis from the given scale.
+   * @param  {d3.scale} y the y scale
+   * @param  {object} config the axis configuration
+   * @param  {selection} selection the d3 selection to append the axes to
+   */
+  static drawYAxis(y, config, selection) {
+    if (!config.display) {
+      return;
+    }
+    const yAxis = AxesUtil.createYAxis(config, y);
+
+    let pad = config.labelSize || 13;
+    if (config.labelPadding) {
+      pad += config.labelPadding;
+    }
+
+    const axis = selection.append('g')
+      .attr('class', 'y-axis');
+    axis.append('g')
+      .attr('transform', `translate(${pad}, 0)`)
+      .call(yAxis);
+    if (config.label) {
+
+      axis.append('text')
+        .attr('transform', `rotate(-90)`)
+        .attr('x', -axis.node().getBBox().height / 2)
+        .attr('y', config.labelSize || 13)
+        .style('text-anchor', 'middle')
+        .style('font-size', config.labelSize || 13)
+        .style('fill', config.labelColor)
+        .text(config.label);
+    }
+    return axis;
+  }
+
+  /**
+   * Creates the x axis for a chart.
+   * @param  {d3.scale} x the d3 scale
+   * @param  {d3.selection} selection the d3 selection to add the axis to
+   * @param  {number[]} size the remaining chart size
+   * @param  {Object} config the axis configuration
+   */
+  static drawXAxis(x, selection, size, config) {
+    const xAxis = AxesUtil.createXAxis(config, x);
+
+    const axis = selection.insert('g', ':first-child')
+      .attr('class', 'x-axis')
+      .call(xAxis);
+
+    if (config.labelRotation) {
+      axis.selectAll('text')
+        .attr('transform', `rotate(${config.labelRotation})`)
+        .attr('dx', '-10px')
+        .attr('dy', '1px')
+        .style('text-anchor', 'end');
+    }
+    return axis;
   }
 
 }

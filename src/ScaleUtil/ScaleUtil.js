@@ -2,6 +2,7 @@ import extent from 'd3-array/src/extent';
 import scaleLinear from 'd3-scale/src/linear';
 import scaleTime from 'd3-scale/src/time';
 import scaleLog from 'd3-scale/src/log';
+import scaleBand from 'd3-scale/src/band';
 
 /**
  * Helper functions to create d3 scales.
@@ -109,6 +110,47 @@ class ScaleUtil {
     });
     scales.XSCALE = xscale;
     return scales;
+  }
+
+  /**
+   * Create scales for a grouped bar chart, that is:
+   * * two x axes (one for the top level groups, one for the grouped values)
+   * * one y axis
+   * @param  {Object} config a bar chart configuration
+   * @return {d3.scale[]} the x and y scales
+   */
+  static createBarScales(config) {
+    const xData = config.data.data.map(group => group.value);
+    const yData = config.data.data.reduce((acc, val) => acc.concat(val.values), [])
+      .map(val => val.value)
+      .filter(d => d !== undefined);
+    let xscale;
+    let yscale;
+    Object.values(config.axes).forEach(axis => {
+      let scale;
+      switch (axis.scale) {
+        case 'linear': scale = scaleLinear();
+          break;
+        case 'time': scale = scaleTime();
+          break;
+        case 'log': scale = scaleLog();
+          break;
+        case 'band': scale = scaleBand();
+      }
+      if (axis.orientation === 'x') {
+        xscale = scale;
+        xscale.domain(xData);
+      }
+      if (axis.orientation === 'y') {
+        yscale = scale;
+        ScaleUtil.setDomainForScale(axis, scale, yData, true);
+      }
+    });
+    xscale.range([0, config.size[0]]);
+    yscale.range([0, config.size[1]]);
+    const groupedx = scaleBand().padding(0.1);
+    groupedx.domain(config.data.grouped).rangeRound([0, xscale.bandwidth()]);
+    return [xscale, groupedx, yscale];
   }
 
 }
