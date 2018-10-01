@@ -43,7 +43,66 @@ class BarComponent {
       .attr('class', '.bar-group')
       .attr('value', d => d.value);
 
-    var bars = shapes.selectAll('rect')
+    const bars = this.renderBars(shapes, groupedx, y);
+    this.renderUncertainty(bars, groupedx, y);
+    this.renderLabels(bars, groupedx, y);
+
+    AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx)
+      .attr('transform', `translate(${this.config.position[0]}, ${size[1] - this.config.position[1]})`);
+
+    AxesUtil.drawYAxis(y, this.config.axes.y, root)
+      .attr('transform', `translate(0, ${this.config.position[1]})`);
+
+    BaseUtil.addBackground(g, this.config.position[0], this.config);
+    BaseUtil.addTitle(root, this.config, size);
+  }
+
+  /**
+   * Render bar labels.
+   * @param  {d3.selection} bars the selection to render the labels at
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   */
+  renderLabels(bars, x, y) {
+    bars.append('text')
+      .text(d => d.label)
+      .attr('transform', d => {
+        const chartSize = this.config.size;
+        const translateX = x(d.index) + (x.bandwidth() / 2);
+        const translateY = y(d.value) - 5 || chartSize[1];
+        return `translate(${translateX}, ${translateY})${this.config.rotateBarLabel ? ' rotate(-90)' : ''}`;
+      })
+      .attr('text-anchor', 'middle')
+      .style('font-family', 'sans-serif')
+      .style('font-size', '11px')
+      .style('fill', '#000')
+      .style('font-weight', 'bold')
+      .style('unselectable', 'on');
+
+    if (this.config.rotateBarLabel) {
+      bars.selectAll('text')
+        .attr('dy', (d, idx, el) => el[0].clientHeight / 4)
+        .attr('dx', (d, idx, el) => {
+          if (this.config.showLabelInsideBar) {
+            const textElWidth = el[0].clientWidth;
+            return (textElWidth + 5) * -1;
+          } else {
+            return 0;
+          }
+        })
+        .style('text-anchor', 'start');
+    }
+  }
+
+  /**
+   * Render the bars.
+   * @param  {d3.selection} shapes the node to append to
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   * @return {d3.selection} the bars
+   */
+  renderBars(shapes, x, y) {
+    const bars = shapes.selectAll('rect')
       .data(d => d.values)
       .enter()
       .append('g');
@@ -52,19 +111,27 @@ class BarComponent {
       .append('rect')
       .filter(d => d)
       .style('fill', d => d.color)
-      .attr('x', d => groupedx(d.index))
+      .attr('x', d => x(d.index))
       .attr('y', d => y(d.value))
-      .attr('width', groupedx.bandwidth())
+      .attr('width', x.bandwidth())
       .attr('height', d => this.config.size[1] - y(d.value));
+    return bars;
+  }
 
-    // Uncertainty
-    bars
+  /**
+   * Render the uncertainty measure.
+   * @param  {d3.selection} node the node to render the line to
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   */
+  renderUncertainty(node, x, y) {
+    node
       .append('path')
       .attr('class', 'bar-uncertainty')
       .attr('d', d => {
         if (d.uncertainty && d.uncertainty > 0) {
-          const lineWidth = groupedx.bandwidth() / 3;
-          const xCenter = groupedx(d.index) + groupedx.bandwidth() / 2;
+          const lineWidth = x.bandwidth() / 3;
+          const xCenter = x(d.index) + x.bandwidth() / 2;
           const topVal = d.value + (d.value / 100 * d.uncertainty);
           let bottomVal = d.value - (d.value / 100 * d.uncertainty);
 
@@ -87,50 +154,6 @@ class BarComponent {
       })
       .attr('stroke-opacity', 0.5)
       .attr('stroke-width', 2);
-
-    bars.append('text')
-      .text(d => d.label)
-      .attr('transform', d => {
-        const chartSize = this.config.size;
-        const translateX = groupedx(d.index) + (groupedx.bandwidth() / 2);
-        const translateY = y(d.value) - 5 || chartSize[1];
-        return `translate(${translateX}, ${translateY})`;
-      })
-      .attr('text-anchor', 'middle')
-      .style('font-family', 'sans-serif')
-      .style('font-size', '11px')
-      .style('fill', '#000')
-      .style('font-weight', 'bold')
-      .style('unselectable', 'on');
-
-    if (this.config.rotateBarLabel) {
-      bars.selectAll('text')
-        .attr('transform', d => {
-          const chartSize = this.config.size;
-          const translateX = groupedx(d.index) + (groupedx.bandwidth() / 2);
-          const translateY = y(d.value) - 5 || chartSize[1];
-          return `translate(${translateX}, ${translateY}) rotate(-90)`;
-        })
-        .attr('dy', (d, idx, el) => el[0].clientHeight / 4)
-        .attr('dx', (d, idx, el) => {
-          if (this.config.showLabelInsideBar) {
-            const textElWidth = el[0].clientWidth;
-            return (textElWidth + 5) * -1;
-          } else {
-            return 0;
-          }
-        })
-        .style('text-anchor', 'start');
-    }
-
-    AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx)
-      .attr('transform', `translate(${this.config.position[0]}, ${size[1] - this.config.position[1]})`);
-
-    AxesUtil.drawYAxis(y, this.config.axes.y, root)
-      .attr('transform', `translate(0, ${this.config.position[1]})`);
-
-    BaseUtil.addBackground(g, this.config.position[0], this.config);
-    BaseUtil.addTitle(root, this.config, size);
   }
 
 }
