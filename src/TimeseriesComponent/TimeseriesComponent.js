@@ -292,7 +292,7 @@ class TimeseriesComponent {
     root.selectAll('.y-axes,.y-grid-axes').remove();
     const needRecreate = !g.node();
     if (needRecreate) {
-      g = root.append('g').attr('class', 'timeseries');
+      g = root.append('g').attr('class', `timeseries ${this.config.extraClasses ? this.config.extraClasses : ''}`);
       const clip = g.append('g').attr('class', 'timeseries-clip');
       chartRoot = clip.append('g').attr('class', 'timeseries-chart');
     }

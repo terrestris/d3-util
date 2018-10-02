@@ -1,3 +1,5 @@
+import {event} from 'd3-selection/src/selection/on';
+
 /**
  * A component that can be used in the chart renderer to render a legend.
  */
@@ -58,11 +60,13 @@ class LegendComponent {
       .text(item.title);
 
     if (item.customRenderer instanceof Function) {
-      item.customRenderer(g);
+      item.customRenderer(leg);
     }
     if (item.onClick) {
       leg.style('cursor', 'pointer');
-      leg.on('click', item.onClick);
+      leg.on('click', () => {
+        item.onClick(event);
+      });
     }
   }
 
@@ -73,7 +77,7 @@ class LegendComponent {
    */
   render(root) {
     const g = root.append('g')
-      .attr('class', 'legend')
+      .attr('class', `legend ${this.config.extraClasses ? this.config.extraClasses : ''}`)
       .attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
     this.config.items.forEach((item, idx) => this.constructLegendElement(item, idx, g));
