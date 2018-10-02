@@ -60,6 +60,10 @@ class LegendComponent {
     if (item.customRenderer instanceof Function) {
       item.customRenderer(g);
     }
+    if (item.onClick) {
+      leg.style('cursor', 'pointer');
+      leg.on('click', item.onClick);
+    }
   }
 
   /**

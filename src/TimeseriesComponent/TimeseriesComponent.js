@@ -281,6 +281,7 @@ class TimeseriesComponent {
       // refuse to render chart without series
       return;
     }
+    this.rootNode = root;
 
     let g = root.selectAll('g.timeseries');
     let chartRoot = g.selectAll('g.timeseries-chart');
@@ -332,8 +333,12 @@ class TimeseriesComponent {
         return;
       }
       const y = yScales[line.axes[1]];
-      const dotsg = g.append('g').attr('transform', `translate(${width}, 0)`);
-      const lineg = g.append('g').attr('transform', `translate(${width}, 0)`);
+      const dotsg = g.append('g')
+        .attr('class', `series-${idx}`)
+        .attr('transform', `translate(${width}, 0)`);
+      const lineg = g.append('g')
+        .attr('class', `series-${idx}`)
+        .attr('transform', `translate(${width}, 0)`);
       this.renderDots(dotsg, line, idx, x, y);
       this.renderLine(lineg, line, idx, x, y);
     });
@@ -369,6 +374,22 @@ class TimeseriesComponent {
       }
     });
     return yScales;
+  }
+
+  /**
+   * Toggle the visibility of a series.
+   * @param  {Number} index index of the series to toggle
+   */
+  toggleSeries(index) {
+    const nodes = this.rootNode.selectAll(`g.series-${index}`);
+    const visible = nodes.attr('visible');
+    if (visible === 'false') {
+      nodes.attr('visible', true);
+      nodes.style('display', 'block');
+    } else {
+      nodes.attr('visible', false);
+      nodes.style('display', 'none');
+    }
   }
 
 }
