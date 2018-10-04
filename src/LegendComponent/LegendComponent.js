@@ -1,3 +1,4 @@
+import LabelUtil from '../LabelUtil/LabelUtil';
 import {event} from 'd3-selection/src/selection/on';
 
 /**
@@ -33,9 +34,9 @@ class LegendComponent {
     });
   }
 
-  constructLegendElement = (item, idx, g) => {
+  constructLegendElement = (item, idx, g, extraHeight) => {
     const leg = g.append('g')
-      .attr('transform', `translate(0, ${(idx + 1) * 20})`);
+      .attr('transform', `translate(0, ${(idx + 1) * 20 + extraHeight})`);
     const path = leg.append('path')
       .attr('d', () => {
         const typeUppercase = item.type.toUpperCase();
@@ -51,6 +52,7 @@ class LegendComponent {
       // invisible, but still triggering events
       .style('fill', 'rgba(0,0,0,0)');
     leg.append('text')
+      .attr('class', 'legend-title')
       .text(item.title)
       .attr('text-anchor', 'start')
       .attr('dy', '0')
@@ -68,6 +70,12 @@ class LegendComponent {
         item.onClick(event);
       });
     }
+    if (!this.config.legendEntryMaxLength) {
+      return 0;
+    }
+    LabelUtil.handleLabelWrap(leg, ' g > text.legend-title', 25, 1.2, true, this.config.legendEntryMaxLength);
+    const count = leg.selectAll('tspan').size();
+    return 14 * (count - 1);
   }
 
   /**
@@ -80,7 +88,10 @@ class LegendComponent {
       .attr('class', `legend ${this.config.extraClasses ? this.config.extraClasses : ''}`)
       .attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
-    this.config.items.forEach((item, idx) => this.constructLegendElement(item, idx, g));
+    let extraHeight = 0;
+    this.config.items.forEach((item, idx) => {
+      extraHeight += this.constructLegendElement(item, idx, g, extraHeight);
+    });
   }
 
 }

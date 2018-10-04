@@ -2,6 +2,7 @@ import ChartDataUtil from '../ChartDataUtil/ChartDataUtil';
 import ScaleUtil from '../ScaleUtil/ScaleUtil';
 import AxesUtil from '../AxesUtil/AxesUtil';
 import BaseUtil from '../BaseUtil/BaseUtil';
+import LabelUtil from '../LabelUtil/LabelUtil';
 import zoom from 'd3-zoom/src/zoom';
 import {event} from 'd3-selection/src/selection/on';
 import d3line from 'd3-shape/src/line.js';
@@ -200,6 +201,8 @@ class TimeseriesComponent {
         .attr('dx', '-10px')
         .attr('dy', '1px')
         .style('text-anchor', 'end');
+    } else {
+      LabelUtil.handleLabelWrap(axis);
     }
 
     if (config.showGrid) {
