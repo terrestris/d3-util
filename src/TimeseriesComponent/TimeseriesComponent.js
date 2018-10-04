@@ -4,6 +4,7 @@ import AxesUtil from '../AxesUtil/AxesUtil';
 import BaseUtil from '../BaseUtil/BaseUtil';
 import LabelUtil from '../LabelUtil/LabelUtil';
 import zoom from 'd3-zoom/src/zoom';
+import {identity} from 'd3-zoom/src/transform';
 import {event} from 'd3-selection/src/selection/on';
 import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
@@ -393,6 +394,13 @@ class TimeseriesComponent {
       nodes.attr('visible', false);
       nodes.style('display', 'none');
     }
+  }
+
+  /**
+   * Reset the zoom.
+   */
+  resetZoom() {
+    this.zoomBehaviour.transform(this.rootNode, identity);
   }
 
 }

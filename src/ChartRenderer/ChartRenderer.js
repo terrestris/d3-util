@@ -60,6 +60,17 @@ class ChartRenderer {
     });
   }
 
+  /**
+   * Reset zoom if enabled on a component.
+   */
+  resetZoom() {
+    this.chartConfig.components.forEach(component => {
+      if (component.resetZoom) {
+        component.resetZoom();
+      }
+    });
+  }
+
 }
 
 export default ChartRenderer;

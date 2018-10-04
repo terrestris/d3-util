@@ -92,6 +92,7 @@ class LegendComponent {
     this.config.items.forEach((item, idx) => {
       extraHeight += this.constructLegendElement(item, idx, g, extraHeight);
     });
+    this.legendNode = g;
   }
 
 }
