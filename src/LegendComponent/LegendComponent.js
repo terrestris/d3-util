@@ -70,6 +70,20 @@ class LegendComponent {
         item.onClick(event);
       });
     }
+    if (item.contextmenuHandler) {
+      // looks like there's no longtouch event? new Ext.Element won't
+      // help either (svg not supported?)
+      var timer;
+      leg.on('touchstart', function() {
+        timer = window.setTimeout(() => item.contextmenuHandler(event), 500);
+      });
+      leg.on('touchend', function() {
+        if (timer) {
+          window.clearTimeout(timer);
+        }
+      });
+      leg.on('contextmenu', () => item.contextmenuHandler(event));
+    }
     if (!this.config.legendEntryMaxLength) {
       return 0;
     }
