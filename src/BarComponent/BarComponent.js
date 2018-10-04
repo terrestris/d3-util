@@ -28,7 +28,7 @@ class BarComponent {
     }
 
     const g = root.append('g')
-      .attr('class', 'barchart')
+      .attr('class', `barchart ${this.config.extraClasses ? this.config.extraClasses : ''}`)
       .attr('width', this.config.size[0])
       .attr('height', this.config.size[1])
       .attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
