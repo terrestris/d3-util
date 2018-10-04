@@ -397,6 +397,17 @@ class TimeseriesComponent {
   }
 
   /**
+   * Return whether a series is currently visible.
+   * @param  {Number} index the index of the series
+   * @return {Boolean} whether the series is visible
+   */
+  visible(index) {
+    const nodes = this.rootNode.selectAll(`g.series-${index}`);
+    const visible = nodes.attr('visible');
+    return visible !== 'false';
+  }
+
+  /**
    * Reset the zoom.
    */
   resetZoom() {
