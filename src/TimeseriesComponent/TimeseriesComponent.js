@@ -64,9 +64,22 @@ class TimeseriesComponent {
    * @param  {d3.scale} y the y scale
    */
   renderDots(g, line, idx, x, y) {
-    const tip = d3tip().attr('class', 'd3-tip').html(d => d[1]);
+    /** Empty fn. */
+    let over = () => undefined;
+    /** Empty fn. */
+    let out = () => undefined;
 
-    g.call(tip);
+    if (line.showTooltip) {
+      const tip = d3tip().attr('class', 'd3-tip').html(d => d[1]);
+      g.call(tip);
+      over = tip.show;
+      out = tip.hide;
+    }
+    if (line.useTooltipFunc) {
+      over = (d, idx, dots) => {
+        d[2](dots[idx]);
+      };
+    }
 
     g.selectAll(`circle.series-${idx}`)
       .data(line.data)
@@ -78,8 +91,8 @@ class TimeseriesComponent {
       .attr('cy', d => y(d[1]))
       .attr('r', '5px')
       .attr('fill', line.color)
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide);
+      .on('mouseover', over)
+      .on('mouseout', out);
   }
 
   /**
