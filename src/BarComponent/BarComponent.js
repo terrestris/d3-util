@@ -193,6 +193,15 @@ class BarComponent {
     }
   }
 
+  /**
+   * Set visibility of the uncertainty bar.
+   * @param {Boolean} visible whether the uncertainty should be visible
+   */
+  setUncertaintyVisible(visible) {
+    const node = this.rootNode.selectAll('.bar-uncertainty');
+    node.style('display', visible ? 'block' : 'none');
+  }
+
 }
 
 export default BarComponent;
