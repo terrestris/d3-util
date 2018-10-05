@@ -55,6 +55,7 @@ class BarComponent {
 
     BaseUtil.addBackground(g, this.config.position[0], this.config);
     BaseUtil.addTitle(root, this.config, size);
+    this.rootNode = g;
   }
 
   /**
@@ -105,7 +106,8 @@ class BarComponent {
     const bars = shapes.selectAll('rect')
       .data(d => d.values)
       .enter()
-      .append('g');
+      .append('g')
+      .attr('value', d => d.index);
 
     bars
       .append('rect')
@@ -159,6 +161,36 @@ class BarComponent {
       })
       .attr('stroke-opacity', 0.5)
       .attr('stroke-width', 2);
+  }
+
+  /**
+   * Toggle the group with the given index.
+   * @param  {any} index the x value of the group
+   */
+  toggleGroup(index) {
+    const node = this.rootNode.select(`[value="${index}"]`);
+    if (node.attr('visible') === 'false') {
+      node.style('display', 'block');
+      node.attr('visible', 'true');
+    } else {
+      node.style('display', 'none');
+      node.attr('visible', 'false');
+    }
+  }
+
+  /**
+   * Toggle the grouped bars with the given index
+   * @param  {any} index the x value of the bars
+   */
+  toggleGrouped(index) {
+    const node = this.rootNode.selectAll(`[value="${index}"]`);
+    if (node.attr('visible') === 'false') {
+      node.style('display', 'block');
+      node.attr('visible', 'true');
+    } else {
+      node.style('display', 'none');
+      node.attr('visible', 'false');
+    }
   }
 
 }
