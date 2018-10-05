@@ -114,7 +114,12 @@ class BarComponent {
       .attr('x', d => x(d.index))
       .attr('y', d => y(d.value))
       .attr('width', x.bandwidth())
-      .attr('height', d => this.config.size[1] - y(d.value));
+      .attr('height', d => this.config.size[1] - y(d.value))
+      .on('mouseover', (d, idx, bars) => {
+        if (d.tooltipFunc) {
+          d.tooltipFunc(bars[idx]);
+        }
+      });
     return bars;
   }
 
