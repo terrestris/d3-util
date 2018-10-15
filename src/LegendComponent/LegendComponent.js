@@ -59,7 +59,7 @@ class LegendComponent {
       .attr('dx', '25');
 
     leg.append('title')
-      .text(item.title);
+      .text(item.tooltip || item.title);
 
     if (item.customRenderer instanceof Function) {
       item.customRenderer(leg);

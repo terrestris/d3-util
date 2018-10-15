@@ -109,13 +109,18 @@ class TimeseriesComponent {
       const generator = d3line()
         .x(d => x(d[0]))
         .y(d => y(d[1]));
+      const width = line.style ? line.style['stroke-width'] : 1;
+      const dash = line.style ? line.style['stroke-dasharray'] : undefined;
+      const color = (line.style && line.style.stroke) ? line.style.stroke : line.color;
 
       g.append('path')
         .datum(data)
         .attr('d', generator)
         .attr('class', `series-${idx}`)
         .style('fill', 'none')
-        .style('stroke', line.color);
+        .style('stroke-width', width)
+        .style('stroke-dasharray', dash)
+        .style('stroke', color);
     });
   }
 
@@ -356,8 +361,12 @@ class TimeseriesComponent {
       const lineg = g.append('g')
         .attr('class', `series-${idx}`)
         .attr('transform', `translate(${width}, 0)`);
-      this.renderDots(dotsg, line, idx, x, y);
-      this.renderLine(lineg, line, idx, x, y);
+      if (!line.skipDots) {
+        this.renderDots(dotsg, line, idx, x, y);
+      }
+      if (!line.skipLine) {
+        this.renderLine(lineg, line, idx, x, y);
+      }
     });
   }
 
