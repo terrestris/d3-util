@@ -463,6 +463,7 @@ class TimeseriesComponent {
 
     this.zoomBehaviour = zoom()
       .scaleExtent([1, 10])
+      .translateExtent([[0, 0], this.svgSize])
       .on('zoom', () => {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScales.XSCALE);
@@ -544,6 +545,8 @@ class TimeseriesComponent {
 
     this.yScales = yScales;
     this.mainScaleX = x;
+    this.xOffset = width;
+    this.svgSize = size;
 
     BaseUtil.addBackground(g, width, this.config);
     if (needRecreate) {
