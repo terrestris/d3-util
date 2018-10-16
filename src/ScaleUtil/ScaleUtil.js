@@ -84,7 +84,7 @@ class ScaleUtil {
           scaleData[axis] = [];
         }
         scaleData[axis] = scaleData[axis].concat(line.data
-          .filter(d => d)
+          .filter(d => d !== undefined)
           .map(d => {
             return config.axes[axis].orientation === 'x' ? d[0] : d[1];
           }));
@@ -104,7 +104,7 @@ class ScaleUtil {
       if (config.axes[axis].orientation === 'x') {
         xscale = scale;
       }
-      ScaleUtil.setDomainForScale(config.axes[axis], scale, data.filter(d => d),
+      ScaleUtil.setDomainForScale(config.axes[axis], scale, data.filter(d => d !== undefined),
         config.axes[axis].orientation === 'y');
       scales[axis] = scale;
     });
