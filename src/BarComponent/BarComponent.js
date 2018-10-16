@@ -111,7 +111,7 @@ class BarComponent {
 
     bars
       .append('rect')
-      .filter(d => d)
+      .filter(d => !d.belowThreshold)
       .style('fill', d => d.color)
       .attr('x', d => x(d.index))
       .attr('y', d => y(d.value))
