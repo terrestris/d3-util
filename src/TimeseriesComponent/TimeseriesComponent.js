@@ -6,6 +6,7 @@ import LabelUtil from '../LabelUtil/LabelUtil';
 import zoom from 'd3-zoom/src/zoom';
 import {identity} from 'd3-zoom/src/transform';
 import {event} from 'd3-selection/src/selection/on';
+import select from 'd3-selection/src/select';
 import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
 import d3color from 'd3-color/src/color';
@@ -358,7 +359,7 @@ class TimeseriesComponent {
     }
     const yAxis = AxesUtil.createYAxis(config, y);
 
-    let width = this.calculateAxesWidth(d3.select(selection.node().parentNode));
+    let width = this.calculateAxesWidth(select(selection.node().parentNode));
     let pad = config.labelSize || 13;
     if (config.labelPadding) {
       pad += config.labelPadding;
@@ -393,7 +394,7 @@ class TimeseriesComponent {
     if (!config.display || !config.showGrid) {
       return;
     }
-    let width = this.calculateAxesWidth(d3.select(selection.node().parentNode));
+    let width = this.calculateAxesWidth(select(selection.node().parentNode));
     const gridAxis = AxesUtil.createYAxis(config, y);
     gridAxis
       .tickFormat('')
