@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/terrestris/d3-util#readme",
   "dependencies": {
-    "tinycolor2": "1.4.1"
   },
   "peerDependencies": {
     "d3": "~5",

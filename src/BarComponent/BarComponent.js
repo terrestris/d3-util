@@ -1,7 +1,7 @@
 import BaseUtil from '../BaseUtil/BaseUtil';
 import ScaleUtil from '../ScaleUtil/ScaleUtil';
 import AxesUtil from '../AxesUtil/AxesUtil';
-import tinycolor from 'tinycolor2';
+import d3color from 'd3-color/src/color';
 
 /**
  * A component that can be used in the chart renderer to render a bar chart.
@@ -154,11 +154,7 @@ class BarComponent {
             `M${(xCenter - lineWidth)},${yTop}L${xCenter + lineWidth},${yTop}`;
         }
       })
-      .attr('stroke', function(d) {
-        const color = tinycolor(d.color);
-        color.darken(40);
-        return `#${color.toHex()}`;
-      })
+      .attr('stroke', d => d3color(d.color).darker())
       .attr('stroke-opacity', 0.5)
       .attr('stroke-width', 2);
   }

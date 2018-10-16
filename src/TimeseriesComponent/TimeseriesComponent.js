@@ -8,6 +8,7 @@ import {identity} from 'd3-zoom/src/transform';
 import {event} from 'd3-selection/src/selection/on';
 import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
+import d3color from 'd3-color/src/color';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -81,10 +82,31 @@ class TimeseriesComponent {
       };
     }
 
+    this.renderCircles(g, idx, line, x, y, over, out);
+    this.renderRects(g, idx, line, x, y, over, out);
+    this.renderStars(g, idx, line, x, y, over, out);
+  }
+
+  /**
+   * Render circle type dots.
+   * @param  {d3.selection} g to render the circles to
+   * @param  {Number} idx index of the series
+   * @param  {Object} line the series config
+   * @param  {d3.scale} x x scale
+   * @param  {d3.scale} y y scale
+   * @param  {Function} over the mouseover callback
+   * @param  {Function} out the mouseout callback
+   */
+  renderCircles(g, idx, line, x, y, over, out) {
     g.selectAll(`circle.series-${idx}`)
       .data(line.data)
       .enter()
-      .filter(d => d)
+      .filter(d => {
+        if (d && d[3] && d[3].type && d[3].type !== 'circle') {
+          return false;
+        }
+        return d;
+      })
       .append('circle')
       .attr('class', `series-${idx}`)
       .attr('cx', d => x(d[0]))
@@ -93,6 +115,194 @@ class TimeseriesComponent {
       .attr('fill', line.color)
       .on('mouseover', over)
       .on('mouseout', out);
+  }
+
+  /**
+   * Render rectangle type dots.
+   * @param  {d3.selection} g to render the rects to
+   * @param  {Number} idx index of the series
+   * @param  {Object} line the series config
+   * @param  {d3.scale} x x scale
+   * @param  {d3.scale} y y scale
+   * @param  {Function} over the mouseover callback
+   * @param  {Function} out the mouseout callback
+   */
+  renderStars(g, idx, line, x, y, over, out) {
+    g.selectAll('polygon')
+      .data(line.data)
+      .enter()
+      .filter(d => {
+        if (d && d[3] && d[3].type && d[3].type !== 'star') {
+          return false;
+        }
+        if (d && d[3] && d[3].type === 'star') {
+          return true;
+        }
+        return false;
+      })
+      .append('svg')
+      .attr('x', d => {
+        let val = x(d[0]);
+        if (d[3] && d[3].radius) {
+          val -= d[3].radius;
+        } else {
+          val -= 10;
+        }
+        return val;
+      })
+      .attr('y', d => {
+        let val = y(d[1]);
+        if (d[3] && d[3].radius) {
+          val -= d[3].radius;
+        } else {
+          val -= 10;
+        }
+        return val;
+      })
+      .attr('width', d => {
+        let val = 20;
+        if (d[3] && d[3].radius) {
+          val = d[3].radius * 2;
+        }
+        return val;
+      })
+      .attr('height', d => {
+        let val = 20;
+        if (d[3] && d[3].radius) {
+          val = d[3].radius * 2;
+        }
+        return val;
+      })
+      .append('polygon')
+      .style('fill', d => {
+        let color;
+        if (d && d[3] && d[3].fill) {
+          color = d[3].fill;
+        } else {
+          color = line.color;
+        }
+        return color;
+      })
+      .style('stroke', d => {
+        let color;
+        if (d && d[3] && d[3].stroke) {
+          color = d[3].stroke;
+        } else {
+          color = d3color(line.color).darker();
+        }
+        return color;
+      })
+      .style('stroke-width', 1)
+      .on('mouseover', over)
+      .on('mouseout', out)
+      .attr('points', function(d) {
+        // inspired by http://svgdiscovery.com/C02/create-svg-star-polygon.htm
+        var radius = 10;
+        var sides = 5;
+        if (d[3] && d[3].radius) {
+          var r = d[3].radius;
+          if (r) {
+            radius = parseInt(r);
+          }
+        }
+        if (d[3] && d[3].sides) {
+          var s = d[3].sides;
+          if (s) {
+            sides = parseInt(s);
+          }
+        }
+        var theta = Math.PI * 2 / sides;
+        var x = radius;
+        var y = radius;
+        var star = '';
+        for (var i = 0; i < sides; i++) {
+          var k = i + 1;
+          var sineAngle = Math.sin(theta * k);
+          var cosineAngle = Math.cos(theta * k);
+          var x1 = radius / 2 * sineAngle + x;
+          var y1 = radius / 2 * cosineAngle + y;
+          var sineAngleAlpha = Math.sin(theta * k + 0.5 * theta);
+          var cosineAngleAlpha = Math.cos(theta * k + 0.5 * theta);
+          var x2 = radius * sineAngleAlpha + x;
+          var y2 = radius * cosineAngleAlpha + y;
+          star += x1 + ',' + y1 + ' ';
+          star += x2 + ',' + y2 + ' ';
+        }
+        return star;
+      });
+  }
+
+  /**
+   * Render rectangle type dots.
+   * @param  {d3.selection} g to render the rects to
+   * @param  {Number} idx index of the series
+   * @param  {Object} line the series config
+   * @param  {d3.scale} x x scale
+   * @param  {d3.scale} y y scale
+   * @param  {Function} over the mouseover callback
+   * @param  {Function} out the mouseout callback
+   */
+  renderRects(g, idx, line, x, y, over, out) {
+    g.selectAll('rect')
+      .data(line.data)
+      .enter()
+      .filter(d => {
+        if (d && d[3] && d[3].type && d[3].type !== 'rect') {
+          return false;
+        }
+        if (d && d[3] && d[3].type === 'rect') {
+          return true;
+        }
+        return false;
+      })
+      .append('rect')
+      .style('fill', d => {
+        if (d[3] && d[3].fill) {
+          return d[3].fill;
+        }
+        return line.color;
+      })
+      .style('stroke', d => {
+        let color;
+        if (d[3] && d[3].fill) {
+          color = d[3].fill;
+        }
+        color = line.color;
+        return d3color(color).darker();
+      })
+      .style('stroke-width', 2)
+      .on('mouseover', over)
+      .on('mouseout', out)
+      .attr('x', d => {
+        let val = x(d[0]);
+        if (d[3] && d[3].width) {
+          val -= d[3].width / 2;
+        } else {
+          val -= 5;
+        }
+        return val;
+      })
+      .attr('y', d => {
+        let val = y(d[1]);
+        if (d[3] && d[3].height) {
+          val -= d[3].height / 2;
+        } else {
+          val -= 5;
+        }
+        return val;
+      })
+      .attr('width', d => {
+        if (d[3] && d[3].width) {
+          return d[3].width;
+        }
+        return 10;
+      })
+      .attr('height', d => {
+        if (d[3] && d[3].height) {
+          return d[3].height;
+        }
+        return 10;
+      });
   }
 
   /**
