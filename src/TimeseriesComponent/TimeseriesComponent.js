@@ -10,6 +10,13 @@ import select from 'd3-selection/src/select';
 import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
 import d3color from 'd3-color/src/color';
+import linear from 'd3-shape/src/curve/linear';
+import {step} from 'd3-shape/src/curve/step';
+import {stepBefore} from 'd3-shape/src/curve/step';
+import {stepAfter} from 'd3-shape/src/curve/step';
+import basis from 'd3-shape/src/curve/basis';
+import natural from 'd3-shape/src/curve/natural';
+import monotone from 'd3-shape/src/curve/monotone';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -316,8 +323,26 @@ class TimeseriesComponent {
    */
   renderLine(g, line, idx, x, y) {
     const lineData = ChartDataUtil.lineDataFromPointData(line.data);
+    let curve;
+    switch (line.curveType) {
+      case 'linear': curve = linear;
+        break;
+      case 'cubicBasisSpline': curve = basis;
+        break;
+      case 'curveMonotoneX': curve = monotone;
+        break;
+      case 'naturalCubicSpline': curve = natural;
+        break;
+      case 'curveStep': curve = step;
+        break;
+      case 'curveStepBefore': curve = stepBefore;
+        break;
+      case 'curveStepAfter': curve = stepAfter;
+        break;
+    }
     lineData.forEach(data => {
       const generator = d3line()
+        .curve(curve)
         .x(d => x(d[0]))
         .y(d => y(d[1]));
       const width = line.style ? line.style['stroke-width'] : 1;
