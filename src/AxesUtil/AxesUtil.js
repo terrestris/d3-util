@@ -73,8 +73,8 @@ class AxesUtil {
       .ticks(config.ticks)
       .tickValues(config.tickValues)
       .tickFormat(tickFormatter)
-      .tickSize(config.tickSize || 6)
-      .tickPadding(config.tickPadding || 3);
+      .tickSize(config.tickSize)
+      .tickPadding(config.tickPadding);
     return x;
   }
 
