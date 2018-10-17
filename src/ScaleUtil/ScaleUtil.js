@@ -49,13 +49,17 @@ class ScaleUtil {
       axisDomain[1] = Math.max(ext[1], axisDomain[1]);
     }
 
+    if (axis.harmonize) {
+      axisDomain[0] = Math.pow(10, Math.floor(Math.log(axisDomain[0]) / Math.log(10)));
+      axisDomain[1] = Math.pow(10, Math.ceil(Math.log(axisDomain[1]) / Math.log(10)));
+    }
     if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
       if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
-        axisDomain[0] = Number.MIN_VALUE;
+        axisDomain[0] = 0.000001;
       }
       if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
-        axisDomain[1] = Number.MIN_VALUE;
+        axisDomain[1] = 0.000001;
       }
     }
 
@@ -93,19 +97,20 @@ class ScaleUtil {
     let xscale;
     const scales = {};
     Object.entries(scaleData).map(([axis, data]) => {
+      const cfg = config.axes[axis];
       let scale;
-      switch (config.axes[axis].scale) {
+      switch (cfg.scale) {
         case 'linear': scale = scaleLinear();
           break;
         case 'time': scale = scaleTime();
           break;
         case 'log': scale = scaleLog();
       }
-      if (config.axes[axis].orientation === 'x') {
+      if (cfg.orientation === 'x') {
         xscale = scale;
       }
-      ScaleUtil.setDomainForScale(config.axes[axis], scale, data.filter(d => d !== undefined),
-        config.axes[axis].orientation === 'y');
+      ScaleUtil.setDomainForScale(cfg, scale, data.filter(d => d !== undefined),
+        cfg.orientation === 'y');
       scales[axis] = scale;
     });
     scales.XSCALE = xscale;

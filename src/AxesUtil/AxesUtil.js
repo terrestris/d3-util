@@ -13,6 +13,7 @@ import {
 } from 'd3-time';
 import {axisBottom, axisRight} from 'd3-axis';
 import {format} from 'd3-format';
+import select from 'd3-selection/src/select';
 
 /**
  * Class with helper functions to create/manage chart axes.
@@ -69,9 +70,28 @@ class AxesUtil {
     } else {
       tickFormatter = s => s;
     }
+
+    let ticks = config.ticks;
+    let tickValues = config.tickValues;
+
+    // useful mainly for harmonized log scales on y axis
+    if (config.autoTicks) {
+      ticks = 9;
+      tickValues = [];
+      let cur = scale.domain()[1];
+      // special case to avoid miny = 0 on log scales
+      if (cur < 1) {
+        cur = 0;
+      }
+      for (let i = 1; i <= ticks; ++i) {
+        cur += scale.domain()[0] / 10;
+        tickValues.push(cur);
+      }
+    }
+
     const x = axisFunc(scale)
-      .ticks(config.ticks)
-      .tickValues(config.tickValues)
+      .ticks(ticks)
+      .tickValues(tickValues)
       .tickFormat(tickFormatter)
       .tickSize(config.tickSize)
       .tickPadding(config.tickPadding);
@@ -156,6 +176,36 @@ class AxesUtil {
         .style('text-anchor', 'end');
     }
     return axis;
+  }
+
+  /**
+   * Remove overlapping axis labels for a given axis node.
+   * @param {d3.selection} node the axis node
+   */
+  static sanitizeAxisLabels(node) {
+    const nodes = node.selectAll('.tick text');
+
+    // need to sort the nodes first as the DOM order varies between scale types
+    // (log scale seems to put lowest values first)
+    const list = [];
+    nodes.each((text, idx, nodeList) => {
+      list.push(nodeList[idx]);
+    });
+    list.sort((a, b) => {
+      const abox = a.getClientRects()[0];
+      const bbox = b.getClientRects()[0];
+      return abox.y - bbox.y;
+    });
+
+    let lastPos;
+    list.forEach(text => {
+      const box = text.getClientRects()[0];
+      if (lastPos && box.y < lastPos) {
+        select(text).remove();
+      } else {
+        lastPos = box.y + box.height;
+      }
+    });
   }
 
 }

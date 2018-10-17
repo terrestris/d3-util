@@ -11,12 +11,12 @@ import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
 import d3color from 'd3-color/src/color';
 import linear from 'd3-shape/src/curve/linear';
-import {step} from 'd3-shape/src/curve/step';
+import step from 'd3-shape/src/curve/step';
 import {stepBefore} from 'd3-shape/src/curve/step';
 import {stepAfter} from 'd3-shape/src/curve/step';
 import basis from 'd3-shape/src/curve/basis';
 import natural from 'd3-shape/src/curve/natural';
-import monotone from 'd3-shape/src/curve/monotone';
+import {monotoneX} from 'd3-shape/src/curve/monotone';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -329,7 +329,7 @@ class TimeseriesComponent {
         break;
       case 'cubicBasisSpline': curve = basis;
         break;
-      case 'curveMonotoneX': curve = monotone;
+      case 'curveMonotoneX': curve = monotoneX;
         break;
       case 'naturalCubicSpline': curve = natural;
         break;
@@ -396,6 +396,9 @@ class TimeseriesComponent {
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
+    if (config.sanitizeLabels) {
+      AxesUtil.sanitizeAxisLabels(axis, config.scale === 'log');
+    }
     if (config.label) {
       axis.append('text')
         .attr('transform', `rotate(-90)`)
@@ -519,6 +522,7 @@ class TimeseriesComponent {
    */
   appendClipRect(root, x, y, width, height) {
     this.clipId = `clip-path-${++TimeseriesComponent.counter}`;
+    root.select('defs').remove();
     root.append('defs')
       .append('clipPath')
       .attr('id', this.clipId)
@@ -549,7 +553,7 @@ class TimeseriesComponent {
       root.selectAll(`#${this.clipId}`).remove();
     }
     root.selectAll('.y-axes,.y-grid-axes').remove();
-    const needRecreate = !g.node();
+    const needRecreate = !g.node() || this.zoomType === 'rerender';
     if (needRecreate) {
       g = root.append('g').attr('class', `timeseries ${this.config.extraClasses ? this.config.extraClasses : ''}`);
       const clip = g.append('g').attr('class', 'timeseries-clip');
@@ -576,6 +580,7 @@ class TimeseriesComponent {
 
     BaseUtil.addBackground(g, width, this.config);
     if (needRecreate) {
+      root.select('.timeseries-title').remove();
       BaseUtil.addTitle(root, this.config, size);
     }
   }
