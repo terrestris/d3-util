@@ -190,6 +190,11 @@ which may have the following options:
 * `tickPadding`: the tick padding
 * `tickSize`: the tick size
 
+A note on line charts: you can have multiple y axes here. Using the line chart
+axis references you can have some lines correspond to one y axis and some lines
+correspond to another y axis. As noted above, you still need to use the same x
+axis for all lines (else the chart would supposedly be confusing anyway).
+
 ## Development
 
 If you want to contribute, you can build the project like this:
