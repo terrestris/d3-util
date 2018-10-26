@@ -491,8 +491,9 @@ class TimeseriesComponent {
     }
 
     this.zoomBehaviour = zoom()
-      .scaleExtent([1, 10])
-      .translateExtent([[0, 0], this.svgSize])
+      .extent([[0, 0], [this.config.size[0] - this.xOffset, this.config.size[1]]])
+      .translateExtent([[0, 0], [this.config.size[0] - this.xOffset, this.config.size[1]]])
+      .scaleExtent([1, Infinity])
       .on('zoom', () => {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScales.XSCALE);
@@ -509,7 +510,7 @@ class TimeseriesComponent {
         this.render(root, this.config.size, true);
       });
 
-    root.call(this.zoomBehaviour);
+    root.select('.timeseries-chart').call(this.zoomBehaviour);
   }
 
   /**
@@ -547,17 +548,20 @@ class TimeseriesComponent {
     this.rootNode = root;
 
     let g = root.selectAll('g.timeseries');
-    let chartRoot = g.selectAll('g.timeseries-chart');
+    let chartRoot = g.selectAll('.timeseries-chart');
     if (g.node() && rerender && this.zoomType !== 'transform') {
-      g.remove();
       root.selectAll(`#${this.clipId}`).remove();
     }
     root.selectAll('.y-axes,.y-grid-axes').remove();
     const needRecreate = !g.node() || this.zoomType === 'rerender';
     if (needRecreate) {
-      g = root.append('g').attr('class', `timeseries ${this.config.extraClasses ? this.config.extraClasses : ''}`);
-      const clip = g.append('g').attr('class', 'timeseries-clip');
-      chartRoot = clip.append('g').attr('class', 'timeseries-chart');
+      if (!g.node()) {
+        g = root.append('g').attr('class', `timeseries ${this.config.extraClasses ? this.config.extraClasses : ''}`);
+        const clip = g.append('g').attr('class', 'timeseries-clip');
+        chartRoot = clip.append('g').attr('class', 'timeseries-chart');
+      } else {
+        g.selectAll('.timeseries-data,.x-axis,.timeseries-line').remove();
+      }
     }
     g.attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
@@ -571,14 +575,18 @@ class TimeseriesComponent {
     }
 
     this.drawXAxis(x, g, this.config.size, width);
-    this.renderSeries(rerender, chartRoot, x, yScales, width);
+    // IMPORTANT: need to put the transform on the element upon which the zoom
+    // behaviour works, else centering the zoom on the mouse position will be
+    // next to impossible
+    chartRoot.attr('transform', `translate(${width}, 0)`);
+    this.renderSeries(rerender, chartRoot, x, yScales);
 
     this.yScales = yScales;
     this.mainScaleX = x;
     this.xOffset = width;
     this.svgSize = size;
 
-    BaseUtil.addBackground(g, width, this.config);
+    BaseUtil.addBackground(chartRoot, width, this.config);
     if (needRecreate) {
       root.select('.timeseries-title').remove();
       BaseUtil.addTitle(root, this.config, size);
@@ -591,20 +599,17 @@ class TimeseriesComponent {
    * @param {d3.selection} g the node to render to
    * @param {d3.scale} x the x scale
    * @param {d3.scale[]} yScales the y scales
-   * @param {Number} width the x offset
    */
-  renderSeries(rerender, g, x, yScales, width) {
+  renderSeries(rerender, g, x, yScales) {
     this.config.series.forEach((line, idx) => {
       if (rerender && this.zoomType === 'transform') {
         return;
       }
       const y = yScales[line.axes[1]];
       const dotsg = g.append('g')
-        .attr('class', `series-${idx}`)
-        .attr('transform', `translate(${width}, 0)`);
+        .attr('class', `series-${idx} timeseries-data`);
       const lineg = g.append('g')
-        .attr('class', `series-${idx}`)
-        .attr('transform', `translate(${width}, 0)`);
+        .attr('class', `series-${idx} timeseries-line`);
       if (!line.skipDots) {
         this.renderDots(dotsg, line, idx, x, y);
       }

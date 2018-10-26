@@ -10,16 +10,16 @@ class BaseUtil {
    * @param {Object} config the chart config object
    */
   static addBackground(root, offset, config) {
-    if (config.backgroundColor) {
-      root.select('.timeseries-background').remove();
-      root.insert('rect', ':first-child')
-        .attr('class', 'timeseries-background')
-        .attr('x', offset)
-        .attr('y', 0)
-        .attr('width', config.size[0] - offset)
-        .attr('height', config.size[1])
-        .style('fill', config.backgroundColor);
-    }
+    const color = config.backgroundColor ? config.backgroundColor : 'black';
+    root.select('.timeseries-background').remove();
+    root.insert('rect', ':first-child')
+      .attr('class', 'timeseries-background')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', config.size[0] - offset)
+      .attr('height', config.size[1])
+      .style('opacity', config.backgroundColor ? 1 : 0)
+      .style('fill', color);
   }
 
   /**
