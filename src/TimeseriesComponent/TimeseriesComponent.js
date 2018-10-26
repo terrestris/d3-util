@@ -497,10 +497,12 @@ class TimeseriesComponent {
       .on('zoom', () => {
         const transform = event.transform;
         this.mainScaleX = transform.rescaleX(this.originalScales.XSCALE);
-        this.yScales = {};
-        Object.entries(this.originalScales)
-          .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
-          .forEach(([key, scale]) => this.yScales[key] = transform.rescaleY(scale));
+        if (!this.preventYAxisZoom) {
+          this.yScales = {};
+          Object.entries(this.originalScales)
+            .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
+            .forEach(([key, scale]) => this.yScales[key] = transform.rescaleY(scale));
+        }
         if (zoomType === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
@@ -683,6 +685,14 @@ class TimeseriesComponent {
    */
   resetZoom() {
     this.zoomBehaviour.transform(this.rootNode, identity);
+  }
+
+  /**
+   * Set whether y axis zoom is enabled.
+   * @param {boolean} enable if true, y axis zoom will be possible
+   */
+  enableYAxisZoom(enable) {
+    this.preventYAxisZoom = !enable;
   }
 
 }
