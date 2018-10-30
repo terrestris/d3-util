@@ -618,6 +618,12 @@ class TimeseriesComponent {
       if (!line.skipLine) {
         this.renderLine(lineg, line, idx, x, y);
       }
+      if (line.initiallyVisible === false) {
+        dotsg.style('display', 'none')
+          .attr('visible', false);
+        lineg.style('display', 'none')
+          .attr('visible', false);
+      }
     });
   }
 
