@@ -4,7 +4,7 @@
   "description": "A set of helper classes for working with d3 charts.",
   "main": "src/index.js",
   "scripts": {
-    "release": "np --no-yarn",
+    "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
     "clean:dist": "rimraf ./dist/*",
     "build:dist": "npm run clean:dist && webpack",
     "build:dev": "npm run clean:dist && webpack --mode=development",
