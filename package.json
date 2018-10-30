@@ -1,10 +1,14 @@
 {
   "name": "@terrestris/d3-util",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A set of helper classes for working with d3 charts.",
   "main": "src/index.js",
   "scripts": {
-    "release": "np --no-yarn"
+    "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
+    "clean:dist": "rimraf ./dist/*",
+    "build:dist": "npm run clean:dist && webpack",
+    "build:dev": "npm run clean:dist && webpack --mode=development",
+    "start:dev": "npm run clean:dist && webpack --mode=development --watch"
   },
   "repository": {
     "type": "git",
@@ -16,31 +20,32 @@
     "url": "https://github.com/terrestris/d3-util/issues"
   },
   "homepage": "https://github.com/terrestris/d3-util#readme",
-  "dependencies": {},
+  "dependencies": {
+  },
   "peerDependencies": {
     "d3": "~5",
     "d3-tip": "0.9.1"
   },
   "devDependencies": {
-    "babel-cli": "6.26.0",
-    "babel-core": "6.26.3",
-    "babel-eslint": "9.0.0",
-    "babel-jest": "23.4.2",
-    "babel-loader": "8.0.0",
+    "@babel/core": "7.1.0",
+    "@babel/plugin-proposal-class-properties": "7.1.0",
+    "@babel/plugin-proposal-function-bind": "7.0.0",
+    "@babel/preset-env": "7.1.0",
+    "babel-eslint": "10.0.0",
+    "babel-jest": "23.6.0",
+    "babel-loader": "8.0.2",
     "babel-plugin-dynamic-import-node": "2.1.0",
-    "babel-plugin-import": "1.8.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "6.26.2",
-    "babel-plugin-transform-import-extension-jsx-to-js": "0.1.0",
+    "babel-plugin-import": "1.9.1",
     "babel-polyfill": "6.26.0",
-    "babel-preset-env": "1.7.0",
-    "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
     "coveralls": "3.0.2",
     "d3": "5.7.0",
     "d3-tip": "0.9.1",
-    "jest": "23.5.0",
+    "jest": "23.6.0",
     "moment": "2.22.2",
     "np": "3.0.4",
-    "whatwg-fetch": "2.0.4"
+    "rimraf": "2.6.2",
+    "webpack": "4.20.2",
+    "webpack-cli": "3.1.1",
+    "whatwg-fetch": "3.0.0"
   }
 }

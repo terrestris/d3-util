@@ -12,6 +12,8 @@ import {
   timeYear
 } from 'd3-time';
 import {axisBottom, axisRight} from 'd3-axis';
+import {format} from 'd3-format';
+import select from 'd3-selection/src/select';
 
 /**
  * Class with helper functions to create/manage chart axes.
@@ -50,37 +52,160 @@ class AxesUtil {
   }
 
   /**
-   * Create an x axis.
-   * @param  {string}  type  the type of the axis
-   * @param  {d3.scale}  scale the d3 scale object
-   * @return {d3.axis} the d3 axis object
+   * Create an axis.
+   * @param {Object} config the axis configuration
+   * @param {d3.scale} scale the d3 scale object
+   * @param {Function} axisFunc the axis function to create
+   * @return {Boolean} the d3 axis object
    */
-  static createXAxis(type, scale) {
+  static createAxis(config, scale, axisFunc) {
     let tickFormatter;
-    if (type === 'time') {
+    if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
+    } else if (config.scale === 'band') {
+      // a numeric format makes no sense here
+      tickFormatter = s => s;
+    } else if (config.format) {
+      tickFormatter = format(config.format);
     } else {
       tickFormatter = s => s;
     }
-    const x = axisBottom(scale).tickFormat(tickFormatter);
+
+    let ticks = config.ticks;
+    let tickValues = config.tickValues;
+
+    // useful mainly for harmonized log scales on y axis
+    if (config.autoTicks) {
+      ticks = 9;
+      tickValues = [];
+      let cur = scale.domain()[1];
+      // special case to avoid miny = 0 on log scales
+      if (cur < 1) {
+        cur = 0;
+      }
+      for (let i = 1; i <= ticks; ++i) {
+        cur += scale.domain()[0] / 10;
+        tickValues.push(cur);
+      }
+    }
+
+    const x = axisFunc(scale)
+      .ticks(ticks)
+      .tickValues(tickValues)
+      .tickFormat(tickFormatter)
+      .tickSize(config.tickSize)
+      .tickPadding(config.tickPadding);
     return x;
   }
 
   /**
-   * Creates an y axis.
-   * @param  {string}  type  the type of the axis
-   * @param  {d3.scale}  scale the d3 scale object
+   * Create an x axis.
+   * @param  {Object} config the axis configuration
+   * @param {d3.scale} scale the d3 scale object
    * @return {d3.axis} the d3 axis object
    */
-  static createYAxis(type, scale) {
-    let tickFormatter;
-    if (type === 'time') {
-      tickFormatter = this.getMultiScaleTimeFormatter;
-    } else {
-      tickFormatter = s => s;
+  static createXAxis(config, scale) {
+    return this.createAxis(config, scale, axisBottom);
+  }
+
+  /**
+   * Creates an y axis.
+   * @param  {Object} config the axis configuration
+   * @param  {d3.scale} scale the d3 scale object
+   * @return {d3.axis} the d3 axis object
+   */
+  static createYAxis(config, scale) {
+    return this.createAxis(config, scale, axisRight);
+  }
+
+  /**
+   * Creates an d3 axis from the given scale.
+   * @param  {d3.scale} y the y scale
+   * @param  {object} config the axis configuration
+   * @param  {selection} selection the d3 selection to append the axes to
+   */
+  static drawYAxis(y, config, selection) {
+    if (!config.display) {
+      return;
     }
-    const y = axisRight(scale).tickFormat(tickFormatter);
-    return y;
+    const yAxis = AxesUtil.createYAxis(config, y);
+
+    let pad = config.labelSize || 13;
+    if (config.labelPadding) {
+      pad += config.labelPadding;
+    }
+
+    const axis = selection.append('g')
+      .attr('class', 'y-axis');
+    axis.append('g')
+      .attr('transform', `translate(${pad}, 0)`)
+      .call(yAxis);
+    if (config.label) {
+
+      axis.append('text')
+        .attr('transform', `rotate(-90)`)
+        .attr('x', -axis.node().getBBox().height / 2)
+        .attr('y', config.labelSize || 13)
+        .style('text-anchor', 'middle')
+        .style('font-size', config.labelSize || 13)
+        .style('fill', config.labelColor)
+        .text(config.label);
+    }
+    return axis;
+  }
+
+  /**
+   * Creates the x axis for a chart.
+   * @param  {d3.scale} x the d3 scale
+   * @param  {d3.selection} selection the d3 selection to add the axis to
+   * @param  {number[]} size the remaining chart size
+   * @param  {Object} config the axis configuration
+   */
+  static drawXAxis(x, selection, size, config) {
+    const xAxis = AxesUtil.createXAxis(config, x);
+
+    const axis = selection.insert('g', ':first-child')
+      .attr('class', 'x-axis')
+      .call(xAxis);
+
+    if (config.labelRotation) {
+      axis.selectAll('text')
+        .attr('transform', `rotate(${config.labelRotation})`)
+        .attr('dx', '-10px')
+        .attr('dy', '1px')
+        .style('text-anchor', 'end');
+    }
+    return axis;
+  }
+
+  /**
+   * Remove overlapping axis labels for a given axis node.
+   * @param {d3.selection} node the axis node
+   */
+  static sanitizeAxisLabels(node) {
+    const nodes = node.selectAll('.tick text');
+
+    // need to sort the nodes first as the DOM order varies between scale types
+    // (log scale seems to put lowest values first)
+    const list = [];
+    nodes.each((text, idx, nodeList) => {
+      list.push(nodeList[idx]);
+    });
+    list.sort((a, b) => {
+      const abox = a.getClientRects()[0];
+      const bbox = b.getClientRects()[0];
+      return abox.y - bbox.y;
+    });
+
+    let lastPos;
+    list.forEach(text => {
+      const box = text.getClientRects()[0];
+      if (lastPos && box.y < lastPos) {
+        select(text).remove();
+      } else {
+        lastPos = box.y + box.height;
+      }
+    });
   }
 
 }

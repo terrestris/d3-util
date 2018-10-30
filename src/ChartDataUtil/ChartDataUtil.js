@@ -24,6 +24,11 @@ class ChartDataUtil {
       }
       last = d;
     });
+
+    if (last) {
+      line.push(last);
+    }
+
     if (line.length > 1) {
       lineData.push(line);
     }

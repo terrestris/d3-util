@@ -44,14 +44,31 @@ class ChartRenderer {
   render(element) {
     const {
       components,
-      size
+      size,
+      zoomType
     } = this.chartConfig;
 
     select(element).selectAll('svg').remove();
 
     const svg = this.createSvgRoot(element);
 
-    components.forEach(component => component.render(svg, [size[0] - 20, size[1] - 20]));
+    components.forEach(component => {
+      component.render(svg, size);
+      if (component.enableZoom) {
+        component.enableZoom(svg, zoomType);
+      }
+    });
+  }
+
+  /**
+   * Reset zoom if enabled on a component.
+   */
+  resetZoom() {
+    this.chartConfig.components.forEach(component => {
+      if (component.resetZoom) {
+        component.resetZoom();
+      }
+    });
   }
 
 }

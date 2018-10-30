@@ -1,14 +1,9 @@
 {
   "presets": [
-    "env",
-    "stage-0",
-    "react"
+    "@babel/env"
   ],
-  "env": {
-    "test": {
-      "plugins": [
-        "transform-es2015-modules-commonjs"
-      ]
-    }
-  }
+  "plugins": [
+    "@babel/plugin-proposal-function-bind",
+    ["@babel/plugin-proposal-class-properties", { "loose": false }],
+  ]
 }
