@@ -645,7 +645,7 @@ class TimeseriesComponent {
       }
       yScales[line.axes[1]] = y;
       if (this.config.axes[line.axes[1]].display &&
-        !yAxesDrawn.includes(line.axes[1])) {
+        !yAxesDrawn.includes(line.axes[1]) && line.initiallyVisible !== false) {
         this.drawYAxis(y, line, g, this.config.size);
         yAxesDrawn.push(line.axes[1]);
       }
@@ -690,7 +690,8 @@ class TimeseriesComponent {
    * Reset the zoom.
    */
   resetZoom() {
-    this.zoomBehaviour.transform(this.rootNode, identity);
+    this.rootNode.select('.timeseries-chart')
+      .transition().duration(750).call(this.zoomBehaviour.transform, identity);
   }
 
   /**
