@@ -22,7 +22,7 @@ class BarComponent {
    * @param  {number[]} size the size of the svg
    */
   render(root, size) {
-    if (!this.config.data || this.config.data.data.length === 0) {
+    if (!this.config || !this.config.data || this.config.data.data.length === 0) {
       // refuse to render chart without data
       return;
     }

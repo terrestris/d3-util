@@ -59,6 +59,10 @@ class AxesUtil {
    * @return {Boolean} the d3 axis object
    */
   static createAxis(config, scale, axisFunc) {
+    // return early if no config is present
+    if (!config) {
+      return;
+    }
     let tickFormatter;
     if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
@@ -125,7 +129,7 @@ class AxesUtil {
    * @param  {selection} selection the d3 selection to append the axes to
    */
   static drawYAxis(y, config, selection) {
-    if (!config.display) {
+    if (!config || !config.display) {
       return;
     }
     const yAxis = AxesUtil.createYAxis(config, y);
