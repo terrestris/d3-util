@@ -5,6 +5,7 @@ import BaseUtil from '../BaseUtil/BaseUtil';
 import LabelUtil from '../LabelUtil/LabelUtil';
 import zoom from 'd3-zoom/src/zoom';
 import {identity} from 'd3-zoom/src/transform';
+import zoomTransform from 'd3-zoom/src/transform';
 import {event} from 'd3-selection/src/selection/on';
 import select from 'd3-selection/src/select';
 import d3line from 'd3-shape/src/line.js';
@@ -512,7 +513,12 @@ class TimeseriesComponent {
         this.render(root, this.config.size, true);
       });
 
-    root.select('.timeseries-chart').call(this.zoomBehaviour);
+    const zoomSelection = root.select('.timeseries-chart');
+    zoomSelection.call(this.zoomBehaviour);
+    if (this.config.initialZoom) {
+      this.zoomBehaviour.translateTo(zoomSelection, this.config.initialZoom.x, this.config.initialZoom.y);
+      this.zoomBehaviour.scaleTo(zoomSelection, this.config.initialZoom.k);
+    }
   }
 
   /**
@@ -692,6 +698,14 @@ class TimeseriesComponent {
   resetZoom() {
     this.rootNode.select('.timeseries-chart')
       .transition().duration(750).call(this.zoomBehaviour.transform, identity);
+  }
+
+  /**
+   * Returns the current zoom transformation.
+   * @return {d3.transform} the current transform
+   */
+  getCurrentZoom() {
+    return zoomTransform(this.rootNode.select('.timeseries-chart').node());
   }
 
   /**
