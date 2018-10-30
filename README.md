@@ -139,6 +139,8 @@ A line chart configuration has the following options:
 * `useTooltipFunc`: a boolean indicating whether the third data value is a
 tooltip function
 * `data`: an array with the data: `[xvalue, yvalue, tooltipFunc, styleObject]`
+* `initiallyVisible`: a boolean indicating whether the line is initially visible
+defaulting to true
 
 The tooltip function is optional as well as the style. If the style is set, it
 is used to configure the corresponding point symbol. Examples for style objects
