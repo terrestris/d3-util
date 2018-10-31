@@ -8,6 +8,7 @@
     "lint": "eslint --ext js src/",
     "test": "jest --maxWorkers=4",
     "test:watch": "jest --watchAll",
+    "coveralls": "cat coverage/lcov.info | coveralls",
     "clean:dist": "rimraf ./dist/*",
     "build:dist": "npm run clean:dist && webpack",
     "build:dev": "npm run clean:dist && webpack --mode=development",
@@ -23,8 +24,7 @@
     "url": "https://github.com/terrestris/d3-util/issues"
   },
   "homepage": "https://github.com/terrestris/d3-util#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "d3": "~5",
     "d3-tip": "0.9.1"
