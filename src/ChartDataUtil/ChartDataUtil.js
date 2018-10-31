@@ -6,8 +6,8 @@ class ChartDataUtil {
   /**
    * Converts point data to line data by creating pairs of x/y
    * coordinates
-   * @param  {[type]} data [description]
-   * @return {[type]}      [description]
+   * @param  {number[]} data the points
+   * @return {number[][]} the line data
    */
   static lineDataFromPointData(data) {
     const lineData = [];
