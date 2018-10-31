@@ -35,7 +35,7 @@ class LabelUtil {
   }
 
   /**
-   * Handles word wrapping
+   * Handles word wrapping.
    *
    * @param  {Object} textEl The text element collection
    * @param  {Integer} width The maximum width to use
@@ -61,7 +61,7 @@ class LabelUtil {
       while (word) {
         line.push(word);
         tspan.text(line.join(' '));
-        if (tspan.node().getComputedTextLength() > width) {
+        if (tspan.node().getBoundingClientRect().width > width) {
           // keep the first line if it already does not fit,
           // else replace current content
           if (i !== 0) {
