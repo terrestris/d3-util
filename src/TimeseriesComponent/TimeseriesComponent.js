@@ -326,6 +326,7 @@ class TimeseriesComponent {
     const lineData = ChartDataUtil.lineDataFromPointData(line.data);
     let curve;
     switch (line.curveType) {
+      case undefined:
       case 'linear': curve = linear;
         break;
       case 'cubicBasisSpline': curve = basis;
