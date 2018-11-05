@@ -10,7 +10,20 @@ describe('TimeseriesComponent', () => {
   beforeEach(() => {
     component = new TimeseriesComponent({
       series: [{
-        data: [[1, 1], [2, 3]],
+        data: [[1, 1, undefined, {
+          type: 'star',
+          radius: 5,
+          fill: 'red',
+          stroke: 'red',
+          sides: 12
+        }], [2, 3, undefined, {
+          type: 'star'
+        }], [1, 1, undefined, {
+          type: 'circle'
+        }], [1, 1], [1, 1, undefined, {
+          type: 'rect',
+          fill: 'red'
+        }]],
         axes: ['x', 'y'],
         curveType: 'linear'
       }],
@@ -19,11 +32,14 @@ describe('TimeseriesComponent', () => {
           scale: 'linear',
           orientation: 'x',
           min: 0,
-          max: 10
+          max: 10,
+          display: true
         },
         y: {
           scale: 'log',
-          orientation: 'y'
+          orientation: 'y',
+          display: true,
+          showGrid: true
         }
       },
       position: [0, 0],
