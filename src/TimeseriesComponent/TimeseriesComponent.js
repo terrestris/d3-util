@@ -367,7 +367,7 @@ class TimeseriesComponent {
    */
   calculateAxesWidth(node) {
     const axisElems = node.selectAll('.y-axes').nodes();
-    return axisElems.reduce((acc, node) => acc + node.getBBox().width, 0);
+    return axisElems.reduce((acc, node) => acc + node.getBoundingClientRect().width, 0);
   }
 
   /**
