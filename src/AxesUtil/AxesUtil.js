@@ -140,8 +140,8 @@ class AxesUtil {
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
-    if (config.label) {
 
+    if (config.label) {
       axis.append('text')
         .attr('transform', `rotate(-90)`)
         .attr('x', -axis.node().getBBox().height / 2)
