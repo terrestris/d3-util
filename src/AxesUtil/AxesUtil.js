@@ -89,7 +89,9 @@ class AxesUtil {
       }
       for (let i = 1; i <= ticks; ++i) {
         cur += scale.domain()[0] / 10;
-        tickValues.push(cur);
+        if (scale.domain()[0] >= cur && scale.domain()[1] <= cur) {
+          tickValues.push(cur);
+        }
       }
     }
 
