@@ -645,6 +645,10 @@ class TimeseriesComponent {
     const yAxesDrawn = [];
     let g = node.insert('g', ':first-child').attr('class', 'y-axes');
     this.config.series.forEach(line => {
+      // sanitize y values if a log scale is used
+      if (this.config.axes[line.axes[1]].scale === 'log') {
+        line.data = line.data.map(d => [d[0], d[1] === 0 ? ScaleUtil.EPSILON : d[1], d[2], d[3]]);
+      }
       let y = this.originalScales[line.axes[1]];
       y.range([0, this.config.size[1]]);
       if (rerender) {
