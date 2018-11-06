@@ -11,7 +11,7 @@ import {
   timeWeek,
   timeYear
 } from 'd3-time';
-import {axisBottom, axisRight} from 'd3-axis';
+import {axisBottom, axisLeft} from 'd3-axis';
 import {format} from 'd3-format';
 import select from 'd3-selection/src/select';
 
@@ -121,7 +121,7 @@ class AxesUtil {
    * @return {d3.axis} the d3 axis object
    */
   static createYAxis(config, scale) {
-    return this.createAxis(config, scale, axisRight);
+    return this.createAxis(config, scale, axisLeft);
   }
 
   /**
