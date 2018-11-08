@@ -87,7 +87,7 @@ class LegendComponent {
     if (!this.config.legendEntryMaxLength) {
       return 0;
     }
-    LabelUtil.handleLabelWrap(leg, ' g > text.legend-title', 25, 1.2, true, this.config.legendEntryMaxLength);
+    LabelUtil.handleLabelWrap(leg, ' g > text.legend-title', 25, 1.2, true, 20);
     const count = leg.selectAll('tspan').size();
     return 14 * (count - 1);
   }
