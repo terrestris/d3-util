@@ -129,8 +129,9 @@ class AxesUtil {
    * @param  {d3.scale} y the y scale
    * @param  {object} config the axis configuration
    * @param  {selection} selection the d3 selection to append the axes to
+   * @param  {number} yPosition the y offset
    */
-  static drawYAxis(y, config, selection) {
+  static drawYAxis(y, config, selection, yPosition) {
     if (!config || !config.display) {
       return;
     }
@@ -146,12 +147,13 @@ class AxesUtil {
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
+    const box = axis.node().getBoundingClientRect();
+    axis.attr('transform', `translate(${box.width}, ${yPosition})`);
     if (config.label) {
-
       axis.append('text')
         .attr('transform', `rotate(-90)`)
-        .attr('x', -axis.node().getBBox().height / 2)
-        .attr('y', config.labelSize || 13)
+        .attr('x', -box.height / 2)
+        .attr('y', (config.labelSize || 13) - box.width)
         .style('text-anchor', 'middle')
         .style('font-size', config.labelSize || 13)
         .style('fill', config.labelColor)

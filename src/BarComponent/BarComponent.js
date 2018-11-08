@@ -17,25 +17,44 @@ class BarComponent {
   }
 
   /**
+   * Determine axes offsets.
+   * @param {d3.scale} x the x scale
+   * @param {d3.scale} y the y scale
+   * @param {d3.selection} root the node to append to
+   * @param {number[]} size the chart size
+   * @return {number[]} the width of the y axis and the height of the x axis
+   */
+  determineAxesOffsets(x, y, root, size) {
+    const xNode = AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx).node();
+    const yNode = AxesUtil.drawYAxis(y, this.config.axes.y, root, this.config.position[1]).node();
+    const result = [yNode.getBoundingClientRect().width, xNode.getBoundingClientRect().height];
+    xNode.remove();
+    yNode.remove();
+    return result;
+  }
+
+  /**
    * Render the timeseries to the given root node.
    * @param  {d3.selection} root the root node
-   * @param  {number[]} size the size of the svg
    */
-  render(root, size) {
+  render(root) {
     if (!this.config || !this.config.data || this.config.data.data.length === 0) {
       // refuse to render chart without data
       return;
     }
 
+    let [x, groupedx, y] = ScaleUtil.createBarScales(this.config);
+    x.paddingInner(0.1);
+    const offsets = this.determineAxesOffsets(x, y, root, this.config.size);
+    y = y.range([0, this.config.size[1] - offsets[1]]);
+
     const g = root.append('g')
       .attr('class', `barchart ${this.config.extraClasses ? this.config.extraClasses : ''}`)
-      .attr('width', this.config.size[0])
-      .attr('height', this.config.size[1])
-      .attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
+      .attr('width', this.config.size[0] - offsets[0])
+      .attr('height', this.config.size[1] - offsets[1])
+      .attr('transform', `translate(${offsets[0]}, 0)`);
 
-    const [x, groupedx, y] = ScaleUtil.createBarScales(this.config);
-    x.paddingInner(0.1);
-
+    this.chartSize = [this.config.size[0] - offsets[0], this.config.size[1] - offsets[1]];
     const groups = g.selectAll('.bar-group').data(this.config.data.data);
 
     const shapes = groups.enter().append('g')
@@ -47,14 +66,12 @@ class BarComponent {
     this.renderUncertainty(bars, groupedx, y);
     this.renderLabels(bars, groupedx, y);
 
-    AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx)
-      .attr('transform', `translate(${this.config.position[0]}, ${size[1] - this.config.position[1]})`);
+    AxesUtil.drawXAxis(x, root, this.config.size, this.config.axes.groupx)
+      .attr('transform', `translate(${offsets[0]}, ${this.config.size[1] - offsets[1]})`);
+    AxesUtil.drawYAxis(y, this.config.axes.y, root, 0);
 
-    AxesUtil.drawYAxis(y, this.config.axes.y, root)
-      .attr('transform', `translate(0, ${this.config.position[1]})`);
-
-    BaseUtil.addBackground(g, this.config.position[0], this.config);
-    BaseUtil.addTitle(root, this.config, size);
+    BaseUtil.addBackground(g, this.config.position[0], this.config, this.chartSize);
+    BaseUtil.addTitle(root, this.config, this.config.position[0]);
     this.rootNode = g;
   }
 
@@ -68,7 +85,7 @@ class BarComponent {
     bars.append('text')
       .text(d => d.label)
       .attr('transform', d => {
-        const chartSize = this.config.size;
+        const chartSize = this.chartSize;
         const translateX = x(d.index) + (x.bandwidth() / 2);
         const translateY = y(d.value) - 5 || chartSize[1];
         return `translate(${translateX}, ${translateY})${this.config.rotateBarLabel ? ' rotate(-90)' : ''}`;
@@ -116,7 +133,7 @@ class BarComponent {
       .attr('x', d => x(d.index))
       .attr('y', d => y(d.value))
       .attr('width', x.bandwidth())
-      .attr('height', d => this.config.size[1] - y(d.value))
+      .attr('height', d => this.chartSize[1] - y(d.value))
       .on('mouseover', (d, idx, bars) => {
         if (d.tooltipFunc) {
           d.tooltipFunc(bars[idx]);
