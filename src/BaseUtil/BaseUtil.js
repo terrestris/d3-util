@@ -32,7 +32,7 @@ class BaseUtil {
   static addTitle(root, config, xOffset) {
     if (config.title) {
       root.append('text')
-        .attr('x', config.size[0] / 2 + xOffset)
+        .attr('x', (config.size[0] + xOffset + config.position[0]) / 2)
         .attr('y', parseInt(config.titlePadding) + parseInt(config.titleSize || 20))
         .attr('class', 'timeseries-title')
         .style('text-anchor', 'middle')
