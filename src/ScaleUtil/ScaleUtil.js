@@ -65,6 +65,11 @@ class ScaleUtil {
       }
     }
 
+    // always have at least a minimal domain interval
+    if (axisDomain[0] === axisDomain[1]) {
+      axisDomain[1] += 0.01;
+    }
+
     if (reverse) {
       axisDomain.reverse();
     }
