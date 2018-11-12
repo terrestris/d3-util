@@ -69,6 +69,9 @@ class ScaleUtil {
     if (axisDomain[0] === axisDomain[1]) {
       axisDomain[1] += 0.01;
     }
+    if (axis.factor) {
+      axisDomain[1] = axisDomain[1] / axis.factor;
+    }
 
     if (reverse) {
       axisDomain.reverse();
