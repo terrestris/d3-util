@@ -4,19 +4,20 @@ import AxesUtil from '../AxesUtil/AxesUtil';
 import BaseUtil from '../BaseUtil/BaseUtil';
 import LabelUtil from '../LabelUtil/LabelUtil';
 import zoom from 'd3-zoom/src/zoom';
-import {identity} from 'd3-zoom/src/transform';
-import {event} from 'd3-selection/src/selection/on';
+import { identity } from 'd3-zoom/src/transform';
+import zoomTransform from 'd3-zoom/src/transform';
+import { event } from 'd3-selection/src/selection/on';
 import select from 'd3-selection/src/select';
 import d3line from 'd3-shape/src/line.js';
 import d3tip from 'd3-tip';
 import d3color from 'd3-color/src/color';
 import linear from 'd3-shape/src/curve/linear';
 import step from 'd3-shape/src/curve/step';
-import {stepBefore} from 'd3-shape/src/curve/step';
-import {stepAfter} from 'd3-shape/src/curve/step';
+import { stepBefore } from 'd3-shape/src/curve/step';
+import { stepAfter } from 'd3-shape/src/curve/step';
 import basis from 'd3-shape/src/curve/basis';
 import natural from 'd3-shape/src/curve/natural';
-import {monotoneX} from 'd3-shape/src/curve/monotone';
+import { monotoneX } from 'd3-shape/src/curve/monotone';
 
 /**
  * A component that can be used in the chart renderer to render a timeseries
@@ -203,7 +204,7 @@ class TimeseriesComponent {
       .style('stroke-width', 1)
       .on('mouseover', over)
       .on('mouseout', out)
-      .attr('points', function(d) {
+      .attr('points', function (d) {
         // inspired by http://svgdiscovery.com/C02/create-svg-star-polygon.htm
         var radius = 10;
         var sides = 5;
@@ -325,6 +326,7 @@ class TimeseriesComponent {
     const lineData = ChartDataUtil.lineDataFromPointData(line.data);
     let curve;
     switch (line.curveType) {
+      case undefined:
       case 'linear': curve = linear;
         break;
       case 'cubicBasisSpline': curve = basis;
@@ -375,9 +377,8 @@ class TimeseriesComponent {
    * @param  {d3.scale} y the y scale
    * @param  {object} series the series configuration
    * @param  {selection} selection the d3 selection to append the axes to
-   * @param  {number[]} size the chart size
    */
-  drawYAxis(y, series, selection, size) {
+  drawYAxis(y, series, selection) {
     const config = this.config.axes[series.axes[1]];
     if (!config.display) {
       return;
@@ -399,11 +400,14 @@ class TimeseriesComponent {
     if (config.sanitizeLabels) {
       AxesUtil.sanitizeAxisLabels(axis, config.scale === 'log');
     }
+    const axisHeight = axis.node().getBoundingClientRect().height;
+    const axisWidth = axis.node().getBoundingClientRect().width;
+    axis.attr('transform', `translate(${width + axisWidth}, 0)`);
     if (config.label) {
       axis.append('text')
         .attr('transform', `rotate(-90)`)
-        .attr('x', -size[1] / 2)
-        .attr('y', config.labelSize || 13)
+        .attr('x', -axisHeight / 2)
+        .attr('y', (config.labelSize || 13) - axisWidth)
         .style('text-anchor', 'middle')
         .style('font-size', config.labelSize || 13)
         .style('fill', config.labelColor)
@@ -426,7 +430,7 @@ class TimeseriesComponent {
     const gridAxis = AxesUtil.createYAxis(config, y);
     gridAxis
       .tickFormat('')
-      .tickSize(size[0] - width);
+      .tickSize(-(size[0] - width));
     selection.append('g')
       .attr('transform', `translate(${width}, 0)`)
       .attr('class', 'y-axis')
@@ -470,7 +474,7 @@ class TimeseriesComponent {
         .tickSize(-size[1]);
       selection.insert('g', ':first-child')
         .attr('transform', `translate(${width}, ${size[1]})`)
-        .attr('class', 'x-axis')
+        .attr('class', 'x-grid-axis')
         .style('stroke-width', config.gridWidth || 1)
         .style('color', config.gridColor || '#d3d3d3')
         .style('stroke', config.gridColor || '#d3d3d3')
@@ -509,10 +513,15 @@ class TimeseriesComponent {
           root.selectAll('.timeseries-chart')
             .attr('transform', transform);
         }
-        this.render(root, this.config.size, true);
+        this.render(root, this.svgSize, true);
       });
 
-    root.select('.timeseries-chart').call(this.zoomBehaviour);
+    const zoomSelection = root.select('.timeseries-chart');
+    zoomSelection.call(this.zoomBehaviour);
+    if (this.config.initialZoom) {
+      this.zoomBehaviour.translateTo(zoomSelection, this.config.initialZoom.x, this.config.initialZoom.y);
+      this.zoomBehaviour.scaleTo(zoomSelection, this.config.initialZoom.k);
+    }
   }
 
   /**
@@ -534,6 +543,23 @@ class TimeseriesComponent {
       .attr('y', y)
       .attr('width', width)
       .attr('height', height);
+  }
+
+  /**
+   * Determine the space the axes need by prerendering and removing them.
+   * @param {boolean} rerender whether in rerender mode (probably doesn't matter here)
+   * @param {d3.selection} g the node to render the axes to
+   */
+  determineAxesSpace(rerender, g) {
+    const x = rerender ? this.mainScaleX : this.originalScales.XSCALE.range([0, this.config.size[0]]);
+    this.prepareYAxes(rerender, g, [0, this.config.size[1]]);
+    const width = this.calculateAxesWidth(g);
+    this.drawXAxis(x, g, this.config.size, this.config.size[1]);
+    const xAxisNode = g.select('.x-axis');
+    const height = xAxisNode.node().getBoundingClientRect().height;
+    xAxisNode.remove();
+    g.selectAll('.x-grid-axis,.y-axes,.y-grid-axes').remove();
+    return [width, height];
   }
 
   /**
@@ -562,21 +588,25 @@ class TimeseriesComponent {
         const clip = g.append('g').attr('class', 'timeseries-clip');
         chartRoot = clip.append('g').attr('class', 'timeseries-chart');
       } else {
-        g.selectAll('.timeseries-data,.x-axis,.timeseries-line').remove();
+        g.selectAll('.timeseries-data,.x-axis,.x-grid-axis,.timeseries-line').remove();
       }
     }
+    const offsets = this.determineAxesSpace(rerender, g);
     g.attr('transform', `translate(${this.config.position[0]}, ${this.config.position[1]})`);
 
-    const yScales = this.prepareYAxes(rerender, g);
+    const yScales = this.prepareYAxes(rerender, g, [0, this.config.size[1] - offsets[1]]);
     const width = this.calculateAxesWidth(g);
     const x = rerender ? this.mainScaleX : this.originalScales.XSCALE.range([0, this.config.size[0] - width]);
+
     if (needRecreate) {
-      this.appendClipRect(root, width, 0, this.config.size[0] - width, this.config.size[1]);
+      this.appendClipRect(root, width, 0, this.config.size[0] - width, this.config.size[1] - offsets[1]);
       root.select('.timeseries-clip')
         .attr('clip-path', `url(#${this.clipId})`);
     }
 
-    this.drawXAxis(x, g, this.config.size, width);
+    this.drawXAxis(x, g, [this.config.size[0], this.config.size[1] - offsets[1]], width);
+    g.select('.x-axis').attr('transform', `translate(${width}, ${this.config.size[1] - offsets[1]})`);
+
     // IMPORTANT: need to put the transform on the element upon which the zoom
     // behaviour works, else centering the zoom on the mouse position will be
     // next to impossible
@@ -588,11 +618,9 @@ class TimeseriesComponent {
     this.xOffset = width;
     this.svgSize = size;
 
-    BaseUtil.addBackground(chartRoot, width, this.config);
-    if (needRecreate) {
-      root.select('.timeseries-title').remove();
-      BaseUtil.addTitle(root, this.config, size);
-    }
+    BaseUtil.addBackground(chartRoot, width, this.config, [this.config.size[0], this.config.size[1] - offsets[1]]);
+    root.select('.timeseries-title').remove();
+    BaseUtil.addTitle(root, this.config, width);
   }
 
   /**
@@ -618,6 +646,12 @@ class TimeseriesComponent {
       if (!line.skipLine) {
         this.renderLine(lineg, line, idx, x, y);
       }
+      if (line.initiallyVisible === false) {
+        dotsg.style('display', 'none')
+          .attr('visible', false);
+        lineg.style('display', 'none')
+          .attr('visible', false);
+      }
     });
   }
 
@@ -625,21 +659,26 @@ class TimeseriesComponent {
    * Prepares and renders y axis/scales.
    * @param {Boolean} rerender whether we are in rerender mode
    * @param {d3.selection} node the node to render the axes to
+   * @param {number[]} yRange the y scale range
    * @return {Function[]} the y scales in order of the series
    */
-  prepareYAxes(rerender, node) {
+  prepareYAxes(rerender, node, yRange) {
     const yScales = {};
     const yAxesDrawn = [];
     let g = node.insert('g', ':first-child').attr('class', 'y-axes');
     this.config.series.forEach(line => {
+      // sanitize y values if a log scale is used
+      if (this.config.axes[line.axes[1]].scale === 'log') {
+        line.data = line.data.map(d => [d[0], d[1] === 0 ? ScaleUtil.EPSILON : d[1], d[2], d[3]]);
+      }
       let y = this.originalScales[line.axes[1]];
-      y.range([0, this.config.size[1]]);
       if (rerender) {
         y = this.yScales[line.axes[1]];
       }
+      y.range(yRange);
       yScales[line.axes[1]] = y;
       if (this.config.axes[line.axes[1]].display &&
-        !yAxesDrawn.includes(line.axes[1])) {
+        !yAxesDrawn.includes(line.axes[1]) && line.initiallyVisible !== false) {
         this.drawYAxis(y, line, g, this.config.size);
         yAxesDrawn.push(line.axes[1]);
       }
@@ -684,7 +723,16 @@ class TimeseriesComponent {
    * Reset the zoom.
    */
   resetZoom() {
-    this.zoomBehaviour.transform(this.rootNode, identity);
+    this.rootNode.select('.timeseries-chart')
+      .transition().duration(750).call(this.zoomBehaviour.transform, identity);
+  }
+
+  /**
+   * Returns the current zoom transformation.
+   * @return {d3.transform} the current transform
+   */
+  getCurrentZoom() {
+    return zoomTransform(this.rootNode.select('.timeseries-chart').node());
   }
 
   /**
