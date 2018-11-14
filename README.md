@@ -20,10 +20,10 @@ The chart renderer can be constructed with a few parameters:
 * `components`: a list of chart components constituting the chart
 * `size`: the desired chart size in pixels
 * `zoomType`: the desired zoom type. `'none'` for no zoom, `'transform'` for a
-zoom using the svg `transform` attribute without rebuilding the DOM or
-`'rerender'` for a zoom rebuilding the DOM. Using the transform method has the
-effect of also zooming the shapes, i.e. a line of 1px will get bigger when
-zooming in.
+  zoom using the svg `transform` attribute without rebuilding the DOM or
+  `'rerender'` for a zoom rebuilding the DOM. Using the transform method has the
+  effect of also zooming the shapes, i.e. a line of 1px will get bigger when
+  zooming in.
 
 ### Components
 
@@ -34,25 +34,25 @@ following configuration parameters:
 
 * `extraClasses`: a string with extra CSS classes to add to the legend group
 * `legendEntryMaxLength`: a number with the max number of characters per line
-for legend labels
+  for legend labels
 * `position`: an array `[x, y]` with the desired position within the svg
 * `items`: an array of legend element configurations
 
 The legend items can have the following configuration parameters:
 
 * `contextmenuHandler`: can be a function that is called in case the user
-right clicks or long touches the item. Argument is the `d3.event` event
+  right clicks or long touches the item. Argument is the `d3.event` event
 * `customRenderer`: can be a function that is called during rendering and will
-be called with the item's group element. Can be used to e.g. render custom
-buttons for the legend element
+  be called with the item's group element. Can be used to e.g. render custom
+  buttons for the legend element
 * `onClick`: can be a function getting the current `d3.event` once an item is
-clicked
+  clicked
 * `style`: can be an object with svg style parameters such as `stroke`,
-`stroke-width` etc. in order to style the legend icon
+  `stroke-width` etc. in order to style the legend icon
 * `title`: the legend text
 * `type`: can be `'line'`, `'bar'`, `'area'` or `'background'` in order to
-render a line, a small bar chart icon, a line with the area below it filled or
-just a filled block
+  render a line, a small bar chart icon, a line with the area below it filled or
+  just a filled block
 
 #### BarComponent
 
@@ -71,7 +71,7 @@ configuration parameters:
 * `titleSize`: title size
 * `data`: the data object. Example:
 
-```
+```json
 {
   data: [{
     value: 'Value 1',
@@ -103,15 +103,15 @@ name/label and a list of `values` corresponding to the actual bars.
 The bar objects can have a number of configuration values:
 
 * `index`: corresponds to one of the value in the `grouped` list (not all
-grouped values must be contained in every group)
+  grouped values must be contained in every group)
 * `value`: the actual y value
 * `uncertainty`: if set to a value, an uncertainty indicator will be rendered
-on top of the bar
+  on top of the bar
 * `color`: the hex color value
 * `belowThreshold`: if true, no bar will be drawn, just the label
 * `label`: if set, a label will be rendered onto the bar
 * `tooltipFunc`: if set, the function will be called with the bar element upon
-mouseover
+  mouseover
 
 #### TimeseriesComponent
 
@@ -132,19 +132,21 @@ following configuration parameters:
 A line chart configuration has the following options:
 
 * `axes`: a list of axis ids referencing x and y axis configurations like
-`['x', 'y0']`
+  `['x', 'y0']`
 * `color`: the color hex string
 * `curveType`: a d3 curve type string like `curveStepBefore`
 * `shapeType`: usually `'line'`, can also be `'area'`
 * `useTooltipFunc`: a boolean indicating whether the third data value is a
-tooltip function
+  tooltip function
 * `data`: an array with the data: `[xvalue, yvalue, tooltipFunc, styleObject]`
+* `initiallyVisible`: a boolean indicating whether the line is initially visible
+  defaulting to true
 
 The tooltip function is optional as well as the style. If the style is set, it
 is used to configure the corresponding point symbol. Examples for style objects
 would be:
 
-```
+```json
       {
           "type": "circle",
           "radius": "5"
@@ -185,10 +187,12 @@ which may have the following options:
 * `min`: the axis and scale min value (optional)
 * `orientation`: the axis orientation (x or y)
 * `sanitizeLabels`: if set to true, overlapping tick labels will be removed
-(only supported for y axes)
+  (only supported for y axes)
 * `scale`: the scale to use (linear, log, time)
 * `tickPadding`: the tick padding
 * `tickSize`: the tick size
+* `factor`: if set, the axis' max value will be divided by this value so
+  you can get a bigger interval when using auto calculated min/max values
 
 A note on line charts: you can have multiple y axes here. Using the line chart
 axis references you can have some lines correspond to one y axis and some lines

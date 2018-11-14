@@ -45,7 +45,8 @@ class ChartRenderer {
     const {
       components,
       size,
-      zoomType
+      zoomType,
+      dynamicSize
     } = this.chartConfig;
 
     select(element).selectAll('svg').remove();
@@ -58,6 +59,33 @@ class ChartRenderer {
         component.enableZoom(svg, zoomType);
       }
     });
+
+    if (dynamicSize) {
+      // this currently only works properly for legend heights
+      let width = 0;
+      let height = 0;
+      svg.selectAll('svg > *').each(function() {
+        const box = this.getBoundingClientRect();
+        width += box.width;
+        height += box.height;
+        if (this.getAttribute('transform')) {
+          const match = this.getAttribute('transform').match(/translate[(](\d+)[ ,]+(\d+)/);
+          if (match) {
+            width += parseInt(match[1], 10);
+            height += parseInt(match[2], 10);
+          }
+          // the height calculation seems to be an imprecise business, so round
+          // the value up to the next 10 based multiple
+          // This is probably due to text rendering/rects or something and
+          // should be improved to take text rendering heights properly into
+          // account
+          height = height - (height % 10) + 10;
+        }
+      });
+      svg.attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`);
+    }
   }
 
   /**

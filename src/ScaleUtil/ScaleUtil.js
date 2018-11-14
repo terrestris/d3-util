@@ -9,6 +9,8 @@ import scaleBand from 'd3-scale/src/band';
  */
 class ScaleUtil {
 
+  static EPSILON = 0.000001;
+
   /**
    * Recalculates min/max values from data and axis configuration.
    * @param {object} axis the axis configuration, with scale, min and max
@@ -56,11 +58,19 @@ class ScaleUtil {
     if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
       if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
-        axisDomain[0] = 0.000001;
+        axisDomain[0] = ScaleUtil.EPSILON;
       }
       if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
-        axisDomain[1] = 0.000001;
+        axisDomain[1] = ScaleUtil.EPSILON;
       }
+    }
+
+    // always have at least a minimal domain interval
+    if (axisDomain[0] === axisDomain[1]) {
+      axisDomain[1] += 0.01;
+    }
+    if (axis.factor) {
+      axisDomain[1] = axisDomain[1] / axis.factor;
     }
 
     if (reverse) {

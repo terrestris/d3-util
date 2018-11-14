@@ -11,7 +11,7 @@ import {
   timeWeek,
   timeYear
 } from 'd3-time';
-import {axisBottom, axisRight} from 'd3-axis';
+import {axisBottom, axisLeft} from 'd3-axis';
 import {format} from 'd3-format';
 import select from 'd3-selection/src/select';
 
@@ -59,6 +59,10 @@ class AxesUtil {
    * @return {Boolean} the d3 axis object
    */
   static createAxis(config, scale, axisFunc) {
+    // return early if no config is present
+    if (!config) {
+      return;
+    }
     let tickFormatter;
     if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter;
@@ -85,7 +89,9 @@ class AxesUtil {
       }
       for (let i = 1; i <= ticks; ++i) {
         cur += scale.domain()[0] / 10;
-        tickValues.push(cur);
+        if (scale.domain()[0] >= cur && scale.domain()[1] <= cur) {
+          tickValues.push(cur);
+        }
       }
     }
 
@@ -115,7 +121,7 @@ class AxesUtil {
    * @return {d3.axis} the d3 axis object
    */
   static createYAxis(config, scale) {
-    return this.createAxis(config, scale, axisRight);
+    return this.createAxis(config, scale, axisLeft);
   }
 
   /**
@@ -123,9 +129,10 @@ class AxesUtil {
    * @param  {d3.scale} y the y scale
    * @param  {object} config the axis configuration
    * @param  {selection} selection the d3 selection to append the axes to
+   * @param  {number} yPosition the y offset
    */
-  static drawYAxis(y, config, selection) {
-    if (!config.display) {
+  static drawYAxis(y, config, selection, yPosition) {
+    if (!config || !config.display) {
       return;
     }
     const yAxis = AxesUtil.createYAxis(config, y);
@@ -140,12 +147,13 @@ class AxesUtil {
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
+    const box = axis.node().getBoundingClientRect();
+    axis.attr('transform', `translate(${box.width}, ${yPosition})`);
     if (config.label) {
-
       axis.append('text')
         .attr('transform', `rotate(-90)`)
-        .attr('x', -axis.node().getBBox().height / 2)
-        .attr('y', config.labelSize || 13)
+        .attr('x', -box.height / 2)
+        .attr('y', (config.labelSize || 13) - box.width)
         .style('text-anchor', 'middle')
         .style('font-size', config.labelSize || 13)
         .style('fill', config.labelColor)
