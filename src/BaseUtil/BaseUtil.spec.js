@@ -14,7 +14,7 @@ describe('BaseUtil', () => {
     const root = select(document.body).select('svg');
     BaseUtil.addBackground(root, 0, {
       size: [100, 100]
-    });
+    }, [100, 100]);
     expect(select(document.body).select('rect').node()).toBeTruthy();
   });
 
@@ -24,7 +24,7 @@ describe('BaseUtil', () => {
     BaseUtil.addBackground(root, 0, {
       size: [100, 100],
       backgroundColor: '#ff0000'
-    });
+    }, [100, 100]);
     expect(root.select('rect').node().style.opacity).not.toEqual(0);
   });
 
@@ -32,7 +32,9 @@ describe('BaseUtil', () => {
     document.body.innerHTML = '<svg></svg>';
     const root = select(document.body).select('svg');
     BaseUtil.addTitle(root, {
-      title: 'Some title'
+      title: 'Some title',
+      size: [100, 100],
+      position: [100, 100]
     }, [100, 100]);
     expect(root.select('text').node()).toBeTruthy();
   });
@@ -40,7 +42,7 @@ describe('BaseUtil', () => {
   it('skips adding a title if not configured', () => {
     document.body.innerHTML = '<svg></svg>';
     const root = select(document.body).select('svg');
-    BaseUtil.addTitle(root, {}, [100, 100]);
+    BaseUtil.addTitle(root, {}, 100);
     expect(root.select('text').node()).toBeFalsy();
   });
 
