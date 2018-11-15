@@ -147,6 +147,7 @@ class AxesUtil {
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
       .call(yAxis);
+
     const box = axis.node().getBoundingClientRect();
     axis.attr('transform', `translate(${box.width}, ${yPosition})`);
     if (config.label) {

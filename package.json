@@ -5,6 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
+    "lint": "eslint --ext js src/",
+    "test": "jest --maxWorkers=4",
+    "test:watch": "jest --watchAll",
+    "coveralls": "cat coverage/lcov.info | coveralls",
     "clean:dist": "rimraf ./dist/*",
     "build:dist": "npm run clean:dist && webpack",
     "build:dev": "npm run clean:dist && webpack --mode=development",
@@ -30,6 +34,7 @@
     "@babel/plugin-proposal-class-properties": "7.1.0",
     "@babel/plugin-proposal-function-bind": "7.0.0",
     "@babel/preset-env": "7.1.0",
+    "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
     "babel-jest": "23.6.0",
     "babel-loader": "8.0.4",
