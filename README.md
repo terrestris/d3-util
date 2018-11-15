@@ -75,7 +75,7 @@ configuration parameters:
 * `titleSize`: title size
 * `data`: the data object. Example:
 
-```json
+```javascript
 {
   data: [{
     value: 'Value 1',
