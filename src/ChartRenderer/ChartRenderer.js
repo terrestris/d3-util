@@ -1,5 +1,4 @@
 import select from 'd3-selection/src/select';
-// import {select} from 'd3-selection';
 
 /**
  * Renders a chart according to its configuration.
