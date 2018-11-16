@@ -37,5 +37,8 @@ module.exports = {
   },
   output: {
     library: 'D3Util'
+  },
+  externals: {
+    moment: 'moment'
   }
 };
