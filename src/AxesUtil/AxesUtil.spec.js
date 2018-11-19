@@ -3,6 +3,8 @@
 import AxesUtil from './AxesUtil.js';
 import moment from 'moment';
 import scaleLinear from 'd3-scale/src/linear';
+import scaleLog from 'd3-scale/src/log';
+import select from 'd3-selection/src/select';
 
 describe('AxesUtil', () => {
 
@@ -71,13 +73,83 @@ describe('AxesUtil', () => {
     expect(AxesUtil.createXAxis.bind(AxesUtil)).not.toThrow();
   });
 
-  it('will not fail for undefined axis config', () => {
+  it('will handle the auto ticks flag', () => {
     const result = AxesUtil.createYAxis({
       scale: 'time',
       autoTicks: true
     }, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
+  });
+
+  it('can create d3 axis objects with custom format', () => {
+    const result = AxesUtil.createXAxis({
+      format: '04d'
+    }, scaleLinear());
+    expect((typeof result) === 'function').toEqual(true);
+    expect((typeof result.scale) === 'function').toEqual(true);
+  });
+
+  it('will fail to create a d3 axis object with broken format', () => {
+    /** lint needs doc */
+    const testfn = () => {
+      AxesUtil.createXAxis({
+        format: 'zzz'
+      }, scaleLinear());
+    };
+    expect(testfn).toThrow();
+  });
+
+  it('will handle the auto ticks flag for log scales', () => {
+    const result = AxesUtil.createYAxis({
+      scale: 'log',
+      autoTicks: true
+    }, scaleLog().domain([0.2, 0.1]));
+    expect((typeof result) === 'function').toEqual(true);
+    expect((typeof result.scale) === 'function').toEqual(true);
+  });
+
+  it('will skip drawing an axis if config is not set or set to be hidden', () => {
+    expect(AxesUtil.drawYAxis).not.toThrow();
+    expect(() => AxesUtil.drawYAxis(undefined, {display: false})).not.toThrow();
+  });
+
+  it('respects the label padding parameter', () => {
+    const y = scaleLinear().domain([0, 10]);
+    const svg = document.createElement('svg');
+    document.body.append(svg);
+    const axis = AxesUtil.drawYAxis(y, {
+      label: 'test',
+      labelPadding: 20,
+      display: true
+    }, select(svg), 10);
+    expect(axis).not.toBeUndefined();
+    const transform = axis.select('g[transform]').attr('transform');
+    expect(transform).toEqual('translate(33, 0)');
+  });
+
+  it('can draw an x axis and rotate the labels', () => {
+    const x = scaleLinear().domain([0, 10]);
+    const svg = document.createElement('svg');
+    document.body.append(svg);
+    const axis = AxesUtil.drawXAxis(x, select(svg), undefined, {
+      labelRotation: 45,
+      display: true
+    });
+    expect(axis).not.toBeUndefined();
+    expect(axis.select('text').attr('transform')).toEqual('rotate(45)');
+  });
+
+  it('can sanitize axis labels', () => {
+    const y = scaleLinear().domain([0, 10]);
+    const svg = document.createElement('svg');
+    document.body.append(svg);
+    const axis = AxesUtil.drawYAxis(y, {
+      label: 'test',
+      labelPadding: 20,
+      display: true
+    }, select(svg), 10);
+    AxesUtil.sanitizeAxisLabels(axis);
   });
 
 });

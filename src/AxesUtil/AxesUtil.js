@@ -201,18 +201,18 @@ class AxesUtil {
       list.push(nodeList[idx]);
     });
     list.sort((a, b) => {
-      const abox = a.getClientRects()[0];
-      const bbox = b.getClientRects()[0];
-      return abox.y - bbox.y;
+      const abox = a.getBoundingClientRect();
+      const bbox = b.getBoundingClientRect();
+      return abox.top - bbox.top;
     });
 
     let lastPos;
     list.forEach(text => {
-      const box = text.getClientRects()[0];
-      if (lastPos && box.y < lastPos) {
+      const box = text.getBoundingClientRect();
+      if (lastPos && box.top < lastPos) {
         select(text).remove();
       } else {
-        lastPos = box.y + box.height;
+        lastPos = box.top + box.height;
       }
     });
   }
