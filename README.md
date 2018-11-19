@@ -12,6 +12,9 @@ A set of helper classes for working with d3 charts.
 npm i @terrestris/d3-util
 ```
 
+In order to use the library in your project, make sure you load
+[the moment.js library](https://momentjs.com/) as well.
+
 ## Usage
 
 ### General notes
