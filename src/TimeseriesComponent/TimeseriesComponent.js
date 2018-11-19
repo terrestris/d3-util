@@ -669,7 +669,9 @@ class TimeseriesComponent {
     this.config.series.forEach(line => {
       // sanitize y values if a log scale is used
       if (this.config.axes[line.axes[1]].scale === 'log') {
-        line.data = line.data.map(d => [d[0], d[1] === 0 ? ScaleUtil.EPSILON : d[1], d[2], d[3]]);
+        line.data = line.data
+          .filter(d => d)
+          .map(d => [d[0], d[1] === 0 ? ScaleUtil.EPSILON : d[1], d[2], d[3]]);
       }
       let y = this.originalScales[line.axes[1]];
       if (rerender) {
