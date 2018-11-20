@@ -91,13 +91,11 @@ describe('AxesUtil', () => {
   });
 
   it('will fail to create a d3 axis object with broken format', () => {
-    /** lint needs doc */
-    const testfn = () => {
+    expect(() => {
       AxesUtil.createXAxis({
         format: 'zzz'
       }, scaleLinear());
-    };
-    expect(testfn).toThrow();
+    }).toThrow();
   });
 
   it('will handle the auto ticks flag for log scales', () => {
