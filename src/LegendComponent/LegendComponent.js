@@ -87,7 +87,9 @@ class LegendComponent {
     if (!this.config.legendEntryMaxLength) {
       return 0;
     }
-    LabelUtil.handleLabelWrap(leg, ' g > text.legend-title', 25, 1.2, true, 20);
+    // subtract 25 for the legend icon width
+    const length = this.config.legendEntryMaxLength - 25;
+    leg.selectAll('g > text.legend-title').call(LabelUtil.wordWrap, length, 25, 1.2);
     const count = leg.selectAll('tspan').size();
     return 14 * (count - 1);
   }
