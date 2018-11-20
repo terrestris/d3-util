@@ -71,7 +71,7 @@ class BarComponent {
     AxesUtil.drawYAxis(y, this.config.axes.y, root, 0);
 
     BaseUtil.addBackground(g, this.config.position[0], this.config, this.chartSize);
-    BaseUtil.addTitle(root, this.config, this.config.position[0]);
+    BaseUtil.addTitle(root, this.config, this.config.position[0] + offsets[0]);
     this.rootNode = g;
   }
 

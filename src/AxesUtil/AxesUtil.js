@@ -142,6 +142,10 @@ class AxesUtil {
       pad += config.labelPadding;
     }
 
+    if (!config.label) {
+      pad = 0;
+    }
+
     const axis = selection.append('g')
       .attr('class', 'y-axis');
     axis.append('g')
