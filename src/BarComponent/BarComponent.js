@@ -47,11 +47,11 @@ class BarComponent {
     x.paddingInner(0.1);
     const offsets = this.determineAxesOffsets(x, y, root, this.config.size);
     y = y.range([0, this.config.size[1] - offsets[1]]);
+    x = x.range([0, this.config.size[0] - offsets[0]]);
+    groupedx = groupedx.rangeRound([0, x.bandwidth()]);
 
     const g = root.append('g')
       .attr('class', `barchart ${this.config.extraClasses ? this.config.extraClasses : ''}`)
-      .attr('width', this.config.size[0] - offsets[0])
-      .attr('height', this.config.size[1] - offsets[1])
       .attr('transform', `translate(${offsets[0]}, 0)`);
 
     this.chartSize = [this.config.size[0] - offsets[0], this.config.size[1] - offsets[1]];
@@ -73,6 +73,12 @@ class BarComponent {
     BaseUtil.addBackground(g, this.config.position[0], this.config, this.chartSize);
     BaseUtil.addTitle(root, this.config, this.config.position[0] + offsets[0]);
     this.rootNode = g;
+
+    const padding = this.config.axes.groupx.labelPadding;
+
+    root.attr('viewBox', `0 0 ${this.chartSize[0] + offsets[0] + (padding ? padding : 0)} ${this.chartSize[1] + offsets[1]}`)
+      .attr('width', this.chartSize[0] + offsets[0] + (padding ? padding : 0))
+      .attr('height', this.chartSize[1] + offsets[1]);
   }
 
   /**
