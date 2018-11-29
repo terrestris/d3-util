@@ -78,7 +78,7 @@ class BarComponent {
 
     root.attr('viewBox', `0 0 ${this.chartSize[0] + offsets[0] + (padding ? padding : 0)} ${this.chartSize[1] + offsets[1]}`)
       .attr('width', this.chartSize[0] + offsets[0] + (padding ? padding : 0))
-      .attr('height', this.chartSize[1] + offsets[1]);
+      .attr('height', this.chartSize[1] + offsets[1] + this.config.yOffset);
   }
 
   /**
