@@ -1,3 +1,4 @@
+import LabelUtil from '../LabelUtil/LabelUtil';
 import moment from 'moment';
 import {
   timeFormat
@@ -180,6 +181,7 @@ class AxesUtil {
     const axis = selection.insert('g', ':first-child')
       .attr('class', 'x-axis')
       .call(xAxis);
+    selection.selectAll('.x-axis text').call(LabelUtil.wordWrap, 40, 0, 0);
 
     if (config.labelRotation) {
       axis.selectAll('text')
