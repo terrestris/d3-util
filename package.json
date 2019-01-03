@@ -49,8 +49,8 @@
     "moment": "2.22.2",
     "np": "3.1.0",
     "rimraf": "2.6.3",
-    "webpack": "4.28.1",
-    "webpack-cli": "3.1.2",
+    "webpack": "4.28.2",
+    "webpack-cli": "3.2.0",
     "whatwg-fetch": "3.0.0"
   }
 }
