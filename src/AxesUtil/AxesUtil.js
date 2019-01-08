@@ -98,16 +98,16 @@ class AxesUtil {
 
     const x = axisFunc(scale)
       .tickFormat(tickFormatter);
-    if (ticks) {
+    if (ticks !== undefined) {
       x.ticks(ticks);
     }
-    if (tickValues) {
+    if (tickValues !== undefined) {
       x.tickValues(tickValues);
     }
-    if (config.tickSize) {
+    if (config.tickSize !== undefined) {
       x.tickSize(config.tickSize);
     }
-    if (config.tickPadding) {
+    if (config.tickPadding !== undefined) {
       x.tickPadding(config.tickPadding);
     }
     return x;
