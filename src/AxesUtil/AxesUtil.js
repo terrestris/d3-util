@@ -97,11 +97,19 @@ class AxesUtil {
     }
 
     const x = axisFunc(scale)
-      .ticks(ticks)
-      .tickValues(tickValues)
-      .tickFormat(tickFormatter)
-      .tickSize(config.tickSize)
-      .tickPadding(config.tickPadding);
+      .tickFormat(tickFormatter);
+    if (ticks !== undefined) {
+      x.ticks(ticks);
+    }
+    if (tickValues !== undefined) {
+      x.tickValues(tickValues);
+    }
+    if (config.tickSize !== undefined) {
+      x.tickSize(config.tickSize);
+    }
+    if (config.tickPadding !== undefined) {
+      x.tickPadding(config.tickPadding);
+    }
     return x;
   }
 

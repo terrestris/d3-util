@@ -25,23 +25,6 @@ import { monotoneX } from 'd3-shape/src/curve/monotone';
  */
 class TimeseriesComponent {
 
-  static counter = 0;
-
-  config = {
-    series: [],
-    zoomEnabled: true,
-    backgroundColor: null,
-    startDate: null,
-    endDate: null,
-    size: [100, 100],
-    chartMargin: {
-      top: null,
-      right: null,
-      bottom: null,
-      left: null
-    }
-  }
-
   /**
    * Constructs a new timeseries component with a given configuration.
    * @param {object} config a configuration object
@@ -746,5 +729,7 @@ class TimeseriesComponent {
   }
 
 }
+
+TimeseriesComponent.counter = 0;
 
 export default TimeseriesComponent;

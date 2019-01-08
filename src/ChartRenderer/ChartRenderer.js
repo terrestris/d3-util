@@ -5,11 +5,6 @@ import select from 'd3-selection/src/select';
  */
 class ChartRenderer {
 
-  chartConfig = {
-    components: [],
-    size: [500, 500]
-  };
-
   /**
    * Constructs a renderer object.
    * @param {object} chartConfig the chart configuration to use
