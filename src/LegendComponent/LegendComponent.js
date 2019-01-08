@@ -1,17 +1,17 @@
 import LabelUtil from '../LabelUtil/LabelUtil';
 import {event} from 'd3-selection/src/selection/on';
 
+const SVG_DEFS = {
+  LEGEND_ICON_BACKGROUND: 'M-3 -14 h 25 v 16 h -25 Z',
+  LEGEND_ICON_AREA: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6 M20 -6 v 6 h -20 v -6 Z',
+  LEGEND_ICON_BAR: 'M0 -10 h 6 v 12 h -6 Z M7 -6 h 6 v 8 h -6 Z M14 -10 h 6 v 12 h -6 Z',
+  LEGEND_ICON_LINE: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6'
+};
+
 /**
  * A component that can be used in the chart renderer to render a legend.
  */
 class LegendComponent {
-
-  SVG_DEFS = {
-    LEGEND_ICON_BACKGROUND: 'M-3 -14 h 25 v 16 h -25 Z',
-    LEGEND_ICON_AREA: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6 M20 -6 v 6 h -20 v -6 Z',
-    LEGEND_ICON_BAR: 'M0 -10 h 6 v 12 h -6 Z M7 -6 h 6 v 8 h -6 Z M14 -10 h 6 v 12 h -6 Z',
-    LEGEND_ICON_LINE: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6'
-  }
 
   /**
    * Constructs a new legend component.
@@ -34,20 +34,27 @@ class LegendComponent {
     });
   }
 
-  constructLegendElement = (item, idx, g, extraHeight) => {
+  /**
+   * Construct a legend element.
+   * @param {Object} item legend item config
+   * @param {Number} idx item index
+   * @param {d3.selection} g the legend container
+   * @param {Number} extraHeight extra height to consider
+   */
+  constructLegendElement(item, idx, g, extraHeight) {
     const leg = g.append('g')
       .attr('transform', `translate(0, ${(idx + 1) * 20 + extraHeight})`);
     const path = leg.append('path')
       .attr('d', () => {
         const typeUppercase = item.type.toUpperCase();
-        return this.SVG_DEFS['LEGEND_ICON_' + typeUppercase];
+        return SVG_DEFS['LEGEND_ICON_' + typeUppercase];
       })
       .style('stroke', 'none')
       .style('fill', 'none');
     this.applyStyle(item.style, path);
 
     leg.append('path')
-      .attr('d', this.SVG_DEFS.LEGEND_ICON_BACKGROUND)
+      .attr('d', SVG_DEFS.LEGEND_ICON_BACKGROUND)
       .style('stroke', 'none')
       // invisible, but still triggering events
       .style('fill', 'rgba(0,0,0,0)');

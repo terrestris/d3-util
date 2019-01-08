@@ -4,12 +4,12 @@ import scaleTime from 'd3-scale/src/time';
 import scaleLog from 'd3-scale/src/log';
 import scaleBand from 'd3-scale/src/band';
 
+const EPSILON = 0.000001;
+
 /**
  * Helper functions to create d3 scales.
  */
 class ScaleUtil {
-
-  static EPSILON = 0.000001;
 
   /**
    * Recalculates min/max values from data and axis configuration.
@@ -58,10 +58,10 @@ class ScaleUtil {
     if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
       if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
-        axisDomain[0] = ScaleUtil.EPSILON;
+        axisDomain[0] = EPSILON;
       }
       if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
-        axisDomain[1] = ScaleUtil.EPSILON;
+        axisDomain[1] = EPSILON;
       }
     }
 
