@@ -13,48 +13,58 @@ describe('AxesUtil', () => {
   });
 
   it('returns a string when formatting time', () => {
-    const fn = AxesUtil.getMultiScaleTimeFormatter();
+    const fn = AxesUtil.getMultiScaleTimeFormatter('en')();
     expect((typeof fn) === 'string').toEqual(true);
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-31T13:26:59.889');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('.889');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('.889');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-31T13:26:59.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual(':59');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual(':59');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-31T13:26:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('13:26');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('13:26');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-31T00:00:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('Wed 31');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('Wed 31');
+  });
+
+  it('returns the appropriate formatted time', () => {
+    const date = moment('2018-10-31T00:00:00.000');
+    expect(AxesUtil.getMultiScaleTimeFormatter('de')(date)).toEqual('Mi 31');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-01T00:00:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('October');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('October');
+  });
+
+  it('returns the appropriate formatted time', () => {
+    const date = moment('2018-10-01T00:00:00.000');
+    expect(AxesUtil.getMultiScaleTimeFormatter('de')(date)).toEqual('Oktober');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-01-01T00:00:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('2018');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('2018');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-20T01:00:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('01:00');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('01:00');
   });
 
   it('returns the appropriate formatted time', () => {
     const date = moment('2018-10-21T00:00:00.000');
-    expect(AxesUtil.getMultiScaleTimeFormatter(date)).toEqual('Oct 21');
+    expect(AxesUtil.getMultiScaleTimeFormatter('en')(date)).toEqual('Oct 21');
   });
 
   it('can create d3 axis objects', () => {
