@@ -64,12 +64,12 @@ class AxesUtil {
    * @return {Boolean} the d3 axis object
    */
   static createAxis(config, scale, axisFunc) {
-    const locale = config.locale || 'en';
-    const format = formatLocale(locale.startsWith('de') ? FormatdeDE : FormatenUS).format;
     // return early if no config is present
     if (!config) {
       return;
     }
+    const locale = config.locale || 'en';
+    const format = formatLocale(locale.startsWith('de') ? FormatdeDE : FormatenUS).format;
     let tickFormatter;
     if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter(config.locale || 'en');
