@@ -1,8 +1,6 @@
 import LabelUtil from '../LabelUtil/LabelUtil';
 import moment from 'moment';
-import {
-  timeFormat
-} from 'd3-time-format';
+import timeFormatLocale from 'd3-time-format/src/locale.js';
 import {
   timeSecond,
   timeMinute,
@@ -13,8 +11,12 @@ import {
   timeYear
 } from 'd3-time';
 import {axisBottom, axisLeft} from 'd3-axis';
-import {format} from 'd3-format';
+import formatLocale from 'd3-format/src/locale.js';
 import select from 'd3-selection/src/select';
+import deDE from 'd3-time-format/locale/de-DE.json';
+import enUS from 'd3-time-format/locale/en-US.json';
+import FormatdeDE from 'd3-format/locale/de-DE.json';
+import FormatenUS from 'd3-format/locale/en-US.json';
 
 /**
  * Class with helper functions to create/manage chart axes.
@@ -28,28 +30,30 @@ class AxesUtil {
    * See https://github.com/d3/d3-time-format/blob/master/README.md#locale_format
    * for available D3 datetime formats.
    *
-   * @param  {Date} date The current Date object.
+   * @param  {string} locale The desired locale (de or en currently)
    * @return {function} The multi-scale time format function.
    */
-  static getMultiScaleTimeFormatter(date) {
-    date = moment(date);
+  static getMultiScaleTimeFormatter(locale) {
+    return date => {
+      date = moment(date);
+      const loc = locale.startsWith('de') ? timeFormatLocale(deDE) : timeFormatLocale(enUS);
+      const formatMillisecond = loc.format('.%L');
+      const formatSecond = loc.format(':%S');
+      const formatMinute = loc.format('%H:%M');
+      const formatHour = loc.format('%H:%M');
+      const formatDay = loc.format('%a %d');
+      const formatWeek = loc.format('%b %d');
+      const formatMonth = loc.format('%B');
+      const formatYear = loc.format('%Y');
 
-    const formatMillisecond = timeFormat('.%L');
-    const formatSecond = timeFormat(':%S');
-    const formatMinute = timeFormat('%H:%M');
-    const formatHour = timeFormat('%H:%M');
-    const formatDay = timeFormat('%a %d');
-    const formatWeek = timeFormat('%b %d');
-    const formatMonth = timeFormat('%B');
-    const formatYear = timeFormat('%Y');
-
-    return (timeSecond(date) < date ? formatMillisecond
-      : timeMinute(date) < date ? formatSecond
-        : timeHour(date) < date ? formatMinute
-          : timeDay(date) < date ? formatHour
-            : timeMonth(date) < date ? (timeWeek(date) < date ? formatDay : formatWeek)
-              : timeYear(date) < date ? formatMonth
-                : formatYear)(date);
+      return (timeSecond(date) < date ? formatMillisecond
+        : timeMinute(date) < date ? formatSecond
+          : timeHour(date) < date ? formatMinute
+            : timeDay(date) < date ? formatHour
+              : timeMonth(date) < date ? (timeWeek(date) < date ? formatDay : formatWeek)
+                : timeYear(date) < date ? formatMonth
+                  : formatYear)(date);
+    };
   }
 
   /**
@@ -64,9 +68,11 @@ class AxesUtil {
     if (!config) {
       return;
     }
+    const locale = config.locale || 'en';
+    const format = formatLocale(locale.startsWith('de') ? FormatdeDE : FormatenUS).format;
     let tickFormatter;
     if (config.scale === 'time') {
-      tickFormatter = this.getMultiScaleTimeFormatter;
+      tickFormatter = this.getMultiScaleTimeFormatter(config.locale || 'en');
     } else if (config.scale === 'band') {
       // a numeric format makes no sense here
       tickFormatter = s => s;
