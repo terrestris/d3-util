@@ -49,7 +49,7 @@
     "moment": "2.22.2",
     "np": "4.0.2",
     "rimraf": "2.6.3",
-    "webpack": "4.29.0",
+    "webpack": "4.29.1",
     "webpack-cli": "3.2.2",
     "whatwg-fetch": "3.0.0"
   }
