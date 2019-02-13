@@ -93,7 +93,7 @@ class BarComponent {
       .attr('transform', d => {
         const chartSize = this.chartSize;
         const translateX = x(d.index) + (x.bandwidth() / 2);
-        const translateY = y(d.value) - 5 || chartSize[1];
+        const translateY = d.belowThreshold ? chartSize[1] - 5 : (y(d.value) - 5 || chartSize[1]);
         return `translate(${translateX}, ${translateY})${this.config.rotateBarLabel ? ' rotate(-90)' : ''}`;
       })
       .attr('text-anchor', 'middle')
