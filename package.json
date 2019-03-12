@@ -2,7 +2,7 @@
   "name": "@terrestris/d3-util",
   "version": "0.5.0",
   "description": "A set of helper classes for working with d3 charts.",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
     "lint": "eslint --ext js src/",
@@ -10,9 +10,9 @@
     "test:watch": "jest --watchAll",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "clean:dist": "rimraf ./dist/*",
-    "build:dist": "npm run clean:dist && webpack",
+    "build:dist": "npm run clean:dist && webpack --config browser-build.config.js",
     "build:dev": "npm run clean:dist && webpack --mode=development",
-    "start:dev": "npm run clean:dist && webpack --mode=development --watch"
+    "start:dev": "webpack --config dev-build.config.js --watch --mode=development"
   },
   "repository": {
     "type": "git",
@@ -47,6 +47,7 @@
     "@types/d3-transition": "1.1.4",
     "@types/d3-zoom": "1.7.4",
     "@types/jest": "24.0.11",
+    "awesome-typescript-loader": "5.2.1",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.4.0",
     "babel-loader": "8.0.5",
