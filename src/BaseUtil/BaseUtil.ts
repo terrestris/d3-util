@@ -1,3 +1,22 @@
+import { Selection } from 'd3-selection';
+
+export type NodeSelection = Selection<Element, {}, undefined, undefined>;
+export type SVGSelection = Selection<SVGElement, {}, undefined, undefined>;
+
+export interface BackgroundConfiguration {
+  backgroundColor?: string;
+  size?: [number, number];
+}
+
+export interface TitleConfiguration {
+  title?: string;
+  size?: [number, number];
+  position?: [number, number];
+  titlePadding?: string|number;
+  titleSize?: number;
+  titleColor?: string;
+}
+
 /**
  * Class with helper functions to create/manage chart axes.
  */
@@ -10,7 +29,7 @@ class BaseUtil {
    * @param {Object} config the chart config object
    * @param {Number[]} size the resulting chart size w/o axes
    */
-  static addBackground(root, offset, config, size) {
+  static addBackground(root: NodeSelection, offset: number, config: BackgroundConfiguration, size: [number, number]) {
     const color = config.backgroundColor ? config.backgroundColor : 'black';
     root.select('.timeseries-background').remove();
     root.insert('rect', ':first-child')
@@ -29,11 +48,12 @@ class BaseUtil {
    * @param {Object} config the chart config object
    * @param {Number} xOffset the x offset to add
    */
-  static addTitle(root, config, xOffset) {
+  static addTitle(root: NodeSelection, config: TitleConfiguration, xOffset: number) {
     if (config.title) {
       root.append('text')
         .attr('x', (config.size[0] + xOffset + config.position[0]) / 2)
-        .attr('y', parseInt(config.titlePadding) + parseInt(config.titleSize || 20))
+        .attr('y', parseInt(config.titlePadding as string, 10) +
+          parseInt(config.titleSize as unknown as string || '20', 10))
         .attr('class', 'timeseries-title')
         .style('text-anchor', 'middle')
         .style('font-size', config.titleSize || 20)

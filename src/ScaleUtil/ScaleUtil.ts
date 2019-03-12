@@ -1,15 +1,33 @@
-import extent from 'd3-array/src/extent';
-import scaleLinear from 'd3-scale/src/linear';
-import scaleTime from 'd3-scale/src/time';
-import scaleLog from 'd3-scale/src/log';
-import scaleBand from 'd3-scale/src/band';
+import { extent } from 'd3-array';
+import {
+  scaleTime,
+  scaleLinear,
+  scaleLog,
+  scaleBand,
+  ScaleLinear,
+  ScaleBand,
+  ScaleLogarithmic,
+  ScaleTime
+} from 'd3-scale';
+import { AxisConfiguration } from 'src/AxesUtil/AxesUtil';
+import { TimeseriesConfiguration } from 'src/TimeseriesComponent/TimeseriesComponent';
+import { BarConfiguration } from 'src/BarComponent/BarComponent';
 
-const EPSILON = 0.000001;
+export type Scale = ScaleLinear<number, number>
+  | ScaleBand<string>
+  | ScaleLogarithmic<number, number>
+  | ScaleTime<number, number>;
+
+export type Scales = {
+  [key: string]: Scale;
+};
 
 /**
  * Helper functions to create d3 scales.
  */
 class ScaleUtil {
+
+  static EPSILON = 0.000001;
 
   /**
    * Recalculates min/max values from data and axis configuration.
@@ -19,7 +37,12 @@ class ScaleUtil {
    * @param {any[]} data the data to analyze
    * @param {boolean} reverse whether to invert the data (y-axis)
    */
-  static setDomainForScale(axis, scale, data, reverse) {
+  static setDomainForScale(
+    axis: AxisConfiguration,
+    scale: Scale,
+    data: any[],
+    reverse: boolean
+  ) {
     let axisDomain;
     let makeDomainNice = true;
     let min;
@@ -58,10 +81,10 @@ class ScaleUtil {
     if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
       if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
-        axisDomain[0] = EPSILON;
+        axisDomain[0] = ScaleUtil.EPSILON;
       }
       if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
-        axisDomain[1] = EPSILON;
+        axisDomain[1] = ScaleUtil.EPSILON;
       }
     }
 
@@ -78,9 +101,10 @@ class ScaleUtil {
     }
 
     // actually set the domain
-    var domain = scale.domain(axisDomain);
+    const domain = scale.domain(axisDomain);
     if (makeDomainNice) {
-      domain.nice();
+      // d3 types don't seem to know about .nice
+      (domain as any).nice();
     }
   }
 
@@ -90,8 +114,10 @@ class ScaleUtil {
    * @return {Object} a map mapping axis keys to scales. The special key XSCALE
    * maps to the x scale (only one really makes sense in a timeseries)
    */
-  static createScales(config) {
-    const scaleData = {};
+  static createScales(config: TimeseriesConfiguration) {
+    const scaleData: {
+      [name: string]: number[]
+    } = {};
     config.series.forEach(line => {
       line.axes.forEach(axis => {
         if (!scaleData[axis]) {
@@ -105,16 +131,20 @@ class ScaleUtil {
       });
     });
     let xscale;
-    const scales = {};
+    const scales: Scales = {};
     Object.entries(scaleData).map(([axis, data]) => {
       const cfg = config.axes[axis];
       let scale;
       switch (cfg.scale) {
-        case 'linear': scale = scaleLinear();
+        case 'time':
+          scale = scaleTime();
           break;
-        case 'time': scale = scaleTime();
+        case 'log':
+          scale = scaleLog();
           break;
-        case 'log': scale = scaleLog();
+        case 'linear':
+        default:
+          scale = scaleLinear();
       }
       if (cfg.orientation === 'x') {
         xscale = scale;
@@ -134,37 +164,46 @@ class ScaleUtil {
    * @param  {Object} config a bar chart configuration
    * @return {d3.scale[]} the x and y scales
    */
-  static createBarScales(config) {
-    const xData = config.data.data.map(group => group.value);
-    const yData = config.data.data.reduce((acc, val) => acc.concat(val.values), [])
-      .map(val => val.value)
-      .filter(d => d !== undefined);
+  static createBarScales(config: BarConfiguration):
+    [ScaleBand<string>, ScaleBand<string>, ScaleLinear<number, number>] {
+    const xData = config.data.data.map((group: any) => group.value);
+    const yData = config.data.data.reduce((acc: any, val: any) => acc.concat(val.values), [])
+      .map((val: any) => val.value)
+      .filter((d: any) => d !== undefined);
     let xscale;
     let yscale;
+    let groupedx;
     Object.values(config.axes).forEach(axis => {
       let scale;
       switch (axis.scale) {
-        case 'linear': scale = scaleLinear();
+        case 'time':
+          scale = scaleTime();
           break;
-        case 'time': scale = scaleTime();
+        case 'log':
+          scale = scaleLog();
           break;
-        case 'log': scale = scaleLog();
+        case 'band':
+          scale = scaleBand();
           break;
-        case 'band': scale = scaleBand();
+        case 'linear':
+        default:
+          scale = scaleLinear();
+          break;
       }
       if (axis.orientation === 'x') {
         xscale = scale;
         xscale.domain(xData);
+        xscale.range([0, config.size[0]]);
+        groupedx = scaleBand().padding(0.1);
+        groupedx.domain(config.data.grouped).rangeRound([0, (xscale as ScaleBand<string>).bandwidth()]);
       }
       if (axis.orientation === 'y') {
         yscale = scale;
         ScaleUtil.setDomainForScale(axis, scale, yData, true);
+        yscale.range([0, config.size[1]]);
       }
     });
-    xscale.range([0, config.size[0]]);
-    yscale.range([0, config.size[1]]);
-    const groupedx = scaleBand().padding(0.1);
-    groupedx.domain(config.data.grouped).rangeRound([0, xscale.bandwidth()]);
+
     return [xscale, groupedx, yscale];
   }
 

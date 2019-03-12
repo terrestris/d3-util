@@ -1,11 +1,12 @@
 /*eslint-env jest*/
 
-import TimeseriesComponent from './TimeseriesComponent.js';
-import select from 'd3-selection/src/select';
+import TimeseriesComponent, { TimeseriesConfiguration } from './TimeseriesComponent';
+import { select } from 'd3-selection';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 
 describe('TimeseriesComponent', () => {
 
-  let component;
+  let component: TimeseriesComponent;
 
   beforeEach(() => {
     component = new TimeseriesComponent({
@@ -44,7 +45,7 @@ describe('TimeseriesComponent', () => {
       },
       position: [0, 0],
       size: [100, 100]
-    });
+    } as unknown as TimeseriesConfiguration);
   });
 
   it('is defined', () => {
@@ -54,7 +55,7 @@ describe('TimeseriesComponent', () => {
   it('can render line charts', () => {
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection, [100, 100]);
     const series = node.select('.timeseries-line').node();
     expect(series).not.toEqual(null);
     expect(node.select('g.timeseries-chart').node()).not.toEqual(null);
@@ -63,9 +64,9 @@ describe('TimeseriesComponent', () => {
   it('can enable the zoom', () => {
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
-    component.enableZoom(node);
-    expect(component.zoomBehaviour).not.toBeUndefined;
+    component.render(node as NodeSelection, [100, 100]);
+    component.enableZoom(node as NodeSelection, 'rerender');
+    expect(component.zoomBehaviour).not.toBeUndefined();
   });
 
 });

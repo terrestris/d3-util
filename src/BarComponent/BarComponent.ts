@@ -1,18 +1,58 @@
-import BaseUtil from '../BaseUtil/BaseUtil';
-import ScaleUtil from '../ScaleUtil/ScaleUtil';
-import AxesUtil from '../AxesUtil/AxesUtil';
-import d3color from 'd3-color/src/color';
+import BaseUtil, { NodeSelection, BackgroundConfiguration, TitleConfiguration } from '../BaseUtil/BaseUtil';
+import ScaleUtil, { Scale } from '../ScaleUtil/ScaleUtil';
+import AxesUtil, { AxisConfiguration } from '../AxesUtil/AxesUtil';
+import { color as d3color } from 'd3-color';
+import { ScaleBand } from 'd3-scale';
+
+export interface BarChartDataValue {
+  tooltipFunc?: Function;
+  index: number;
+  belowThreshold: boolean;
+  uncertainty?: number;
+  color: string;
+  value: number;
+}
+
+export interface BarChartDataItem {
+  value: number|string;
+  label: string;
+  values: BarChartDataValue[];
+}
+
+export interface BarChartData {
+  data: BarChartDataItem[];
+  grouped: string[];
+}
+
+export interface BarConfiguration extends BackgroundConfiguration, TitleConfiguration {
+  axes: {
+    x: AxisConfiguration;
+    y: AxisConfiguration;
+    groupx: AxisConfiguration;
+  };
+  size: [number, number];
+  position?: [number, number];
+  data: BarChartData;
+  extraClasses?: string;
+  yOffset?: number;
+  rotateBarLabel?: boolean;
+  showLabelInsideBar?: boolean;
+}
 
 /**
  * A component that can be used in the chart renderer to render a bar chart.
  */
 class BarComponent {
 
+  config: BarConfiguration;
+  chartSize: [number, number];
+  rootNode: NodeSelection;
+
   /**
    * Constructs a new bar chart component.
    * @param {Object} config the bar chart configuration
    */
-  constructor(config) {
+  constructor(config: BarConfiguration) {
     this.config = config;
   }
 
@@ -24,7 +64,7 @@ class BarComponent {
    * @param {number[]} size the chart size
    * @return {number[]} the width of the y axis and the height of the x axis
    */
-  determineAxesOffsets(x, y, root, size) {
+  determineAxesOffsets(x: Scale, y: Scale, root: NodeSelection, size: [number, number]) {
     const xNode = AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx).node();
     const yNode = AxesUtil.drawYAxis(y, this.config.axes.y, root, this.config.position[1]).node();
     const result = [yNode.getBoundingClientRect().width, xNode.getBoundingClientRect().height];
@@ -37,7 +77,7 @@ class BarComponent {
    * Render the timeseries to the given root node.
    * @param  {d3.selection} root the root node
    */
-  render(root) {
+  render(root: NodeSelection) {
     if (!this.config || !this.config.data || this.config.data.data.length === 0) {
       // refuse to render chart without data
       return;
@@ -58,13 +98,13 @@ class BarComponent {
     const groups = g.selectAll('.bar-group').data(this.config.data.data);
 
     const shapes = groups.enter().append('g')
-      .attr('transform', d => `translate(${x(d.value)},0)`)
+      .attr('transform', d => `translate(${x(d.value.toString())},0)`)
       .attr('class', '.bar-group')
       .attr('value', d => d.value);
 
-    const bars = this.renderBars(shapes, groupedx, y);
-    this.renderUncertainty(bars, groupedx, y);
-    this.renderLabels(bars, groupedx, y);
+    const bars = this.renderBars(shapes as NodeSelection, groupedx, y);
+    this.renderUncertainty(bars as NodeSelection, groupedx, y);
+    this.renderLabels(bars as NodeSelection, groupedx, y);
 
     AxesUtil.drawXAxis(x, root, this.config.size, this.config.axes.groupx)
       .attr('transform', `translate(${offsets[0]}, ${this.config.size[1] - offsets[1]})`);
@@ -76,7 +116,8 @@ class BarComponent {
 
     const padding = this.config.axes.groupx.labelPadding;
 
-    root.attr('viewBox', `0 0 ${this.chartSize[0] + offsets[0] + (padding ? padding : 0)} ${this.chartSize[1] + offsets[1]}`)
+    root.attr('viewBox',
+      `0 0 ${this.chartSize[0] + offsets[0] + (padding ? padding : 0)} ${this.chartSize[1] + offsets[1]}`)
       .attr('width', this.chartSize[0] + offsets[0] + (padding ? padding : 0))
       .attr('height', this.chartSize[1] + offsets[1] + this.config.yOffset);
   }
@@ -87,13 +128,13 @@ class BarComponent {
    * @param  {d3.scale} x the x scale
    * @param  {d3.scale} y the y scale
    */
-  renderLabels(bars, x, y) {
+  renderLabels(bars: NodeSelection, x: ScaleBand<string>, y: Scale) {
     bars.append('text')
-      .text(d => d.label)
-      .attr('transform', d => {
+      .text((d: BarChartDataItem) => d.label)
+      .attr('transform', (d: BarChartDataValue) => {
         const chartSize = this.chartSize;
-        const translateX = x(d.index) + (x.bandwidth() / 2);
-        const translateY = d.belowThreshold ? chartSize[1] - 5 : (y(d.value) - 5 || chartSize[1]);
+        const translateX = x(d.index.toString()) + (x.bandwidth() / 2);
+        const translateY = d.belowThreshold ? chartSize[1] - 5 : (y(d.value as any) - 5 || chartSize[1]);
         return `translate(${translateX}, ${translateY})${this.config.rotateBarLabel ? ' rotate(-90)' : ''}`;
       })
       .attr('text-anchor', 'middle')
@@ -105,10 +146,10 @@ class BarComponent {
 
     if (this.config.rotateBarLabel) {
       bars.selectAll('text')
-        .attr('dy', (d, idx, el) => el[0].clientHeight / 4)
+        .attr('dy', (d, idx, el) => (el[0] as Element).clientHeight / 4)
         .attr('dx', (d, idx, el) => {
           if (this.config.showLabelInsideBar) {
-            const textElWidth = el[0].clientWidth;
+            const textElWidth = (el[0] as Element).clientWidth;
             return (textElWidth + 5) * -1;
           } else {
             return 0;
@@ -125,9 +166,9 @@ class BarComponent {
    * @param  {d3.scale} y the y scale
    * @return {d3.selection} the bars
    */
-  renderBars(shapes, x, y) {
+  renderBars(shapes: NodeSelection, x: ScaleBand<string>, y: Scale) {
     const bars = shapes.selectAll('rect')
-      .data(d => d.values)
+      .data((d: BarChartDataItem) => d.values)
       .enter()
       .append('g')
       .attr('value', d => d.index);
@@ -136,13 +177,13 @@ class BarComponent {
       .append('rect')
       .filter(d => !d.belowThreshold)
       .style('fill', d => d.color)
-      .attr('x', d => x(d.index))
-      .attr('y', d => y(d.value))
+      .attr('x', d => x(d.index.toString()))
+      .attr('y', d => y(d.value as any))
       .attr('width', x.bandwidth())
-      .attr('height', d => this.chartSize[1] - y(d.value))
-      .on('mouseover', (d, idx, bars) => {
+      .attr('height', d => this.chartSize[1] - y(d.value as any))
+      .on('mouseover', (d, idx, brs) => {
         if (d.tooltipFunc) {
-          d.tooltipFunc(bars[idx]);
+          d.tooltipFunc(brs[idx]);
         }
       });
     return bars;
@@ -154,14 +195,14 @@ class BarComponent {
    * @param  {d3.scale} x the x scale
    * @param  {d3.scale} y the y scale
    */
-  renderUncertainty(node, x, y) {
+  renderUncertainty(node: NodeSelection, x: ScaleBand<string>, y: Scale) {
     node
       .append('path')
       .attr('class', 'bar-uncertainty')
-      .attr('d', d => {
+      .attr('d', (d: BarChartDataValue) => {
         if (d.uncertainty && d.uncertainty > 0) {
           const lineWidth = x.bandwidth() / 3;
-          const xCenter = x(d.index) + x.bandwidth() / 2;
+          const xCenter = x(d.index.toString()) + x.bandwidth() / 2;
           const topVal = d.value + (d.value / 100 * d.uncertainty);
           let bottomVal = d.value - (d.value / 100 * d.uncertainty);
 
@@ -169,15 +210,16 @@ class BarComponent {
             bottomVal = 0;
           }
 
-          const yTop = y(topVal);
-          const yBottom = y(bottomVal);
+          const yTop = y(topVal as any);
+          const yBottom = y(bottomVal as any);
 
           return `M${xCenter - lineWidth},${yBottom}L${xCenter + lineWidth},${yBottom}` +
             `M${xCenter},${yBottom}L${xCenter},${yTop}` +
             `M${(xCenter - lineWidth)},${yTop}L${xCenter + lineWidth},${yTop}`;
         }
+        return undefined;
       })
-      .attr('stroke', d => d3color(d.color).darker())
+      .attr('stroke', (d: BarChartDataValue) => d3color(d.color).darker().toString())
       .attr('stroke-opacity', 0.5)
       .attr('stroke-width', 2);
   }
@@ -186,7 +228,7 @@ class BarComponent {
    * Toggle the group with the given index.
    * @param  {any} index the x value of the group
    */
-  toggleGroup(index) {
+  toggleGroup(index: string) {
     const node = this.rootNode.select(`[value="${index}"]`);
     if (node.attr('visible') === 'false') {
       node.style('display', 'block');
@@ -201,7 +243,7 @@ class BarComponent {
    * Toggle the grouped bars with the given index
    * @param  {any} index the x value of the bars
    */
-  toggleGrouped(index) {
+  toggleGrouped(index: string) {
     const node = this.rootNode.selectAll(`[value="${index}"]`);
     if (node.attr('visible') === 'false') {
       node.style('display', 'block');
@@ -216,7 +258,7 @@ class BarComponent {
    * Set visibility of the uncertainty bar.
    * @param {Boolean} visible whether the uncertainty should be visible
    */
-  setUncertaintyVisible(visible) {
+  setUncertaintyVisible(visible: boolean) {
     const node = this.rootNode.selectAll('.bar-uncertainty');
     node.style('display', visible ? 'block' : 'none');
   }

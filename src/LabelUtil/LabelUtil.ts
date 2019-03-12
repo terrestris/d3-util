@@ -1,4 +1,5 @@
-import select from 'd3-selection/src/select';
+import { Selection, select } from 'd3-selection';
+import { NodeSelection } from 'src/BaseUtil/BaseUtil';
 
 /**
  * Utilities to word wrap labels automatically.
@@ -17,7 +18,14 @@ class LabelUtil {
    *     be respected. Should be false e.g. when used on an x-axis.
    * @param {Integer} distanceBuffer The buffer used for spacing between labels
    */
-  static handleLabelWrap(root, subSelector, leftPadding, lineHeight, ignoreNeighbors, distanceBuffer) {
+  static handleLabelWrap(
+    root: NodeSelection,
+    subSelector?: string,
+    leftPadding?: number,
+    lineHeight?: number,
+    ignoreNeighbors?: boolean,
+    distanceBuffer?: number
+  ) {
     const node = root.node();
     if (!node) {
       return;
@@ -42,12 +50,17 @@ class LabelUtil {
    * @param  {Integer} leftPadding The amount of padding to the left
    * @param  {Integer} lineHeight The lineHeight in em to use
    */
-  static wordWrap(textEl, width, leftPadding, lineHeight) {
-    textEl.each(function() {
+  static wordWrap(
+    textEl: Selection<HTMLElement, {}, undefined, undefined>,
+    width: number,
+    leftPadding: number,
+    lineHeight: number
+  ) {
+    textEl.each(function(this: HTMLElement) {
       const text = select(this);
       const words = text.text().split(/\s+/).reverse();
       let word;
-      let line = [];
+      let line: string[] = [];
       const lh = lineHeight || 0.2;
       // ems
       const dy = parseFloat(text.attr('dy'));

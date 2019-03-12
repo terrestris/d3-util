@@ -1,6 +1,6 @@
 /*eslint-env jest*/
 
-import ChartDataUtil from './ChartDataUtil.js';
+import ChartDataUtil from './ChartDataUtil';
 
 describe('ChartDataUtil', () => {
 

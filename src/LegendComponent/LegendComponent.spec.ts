@@ -1,7 +1,8 @@
 /*eslint-env jest*/
 
-import LegendComponent from './LegendComponent.js';
-import select from 'd3-selection/src/select';
+import LegendComponent from './LegendComponent';
+import { select } from 'd3-selection';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 
 describe('LegendComponent', () => {
 
@@ -21,7 +22,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('.legend').node()).not.toEqual(null);
   });
 
@@ -32,13 +33,13 @@ describe('LegendComponent', () => {
         style: {
           stroke: '#ff0000'
         },
-        customRenderer: node => node.append('text').attr('class', 'some-class')
+        customRenderer: node2 => node2.append('text').attr('class', 'some-class')
       }],
       position: [0, 0]
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('.some-class').node()).not.toEqual(null);
   });
 
@@ -55,7 +56,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('g[style]').style('cursor')).toEqual('pointer');
   });
 
@@ -72,7 +73,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
   });
 
   it('can set extra classes', () => {
@@ -88,7 +89,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('.some-custom-class').node()).not.toBe(null);
   });
 
@@ -106,7 +107,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.selectAll('tspan').size()).toBe(4);
   });
 
