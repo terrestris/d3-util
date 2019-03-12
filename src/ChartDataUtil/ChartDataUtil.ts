@@ -9,10 +9,10 @@ class ChartDataUtil {
    * @param  {number[][]} data the points
    * @return {number[][][]} the line data
    */
-  static lineDataFromPointData(data) {
+  static lineDataFromPointData(data: number[][]): number[][][] {
     const lineData = [];
-    let last;
-    let line = [];
+    let last: number[];
+    let line: number[][] = [];
     data.forEach(d => {
       if (last !== undefined) {
         line.push(last);

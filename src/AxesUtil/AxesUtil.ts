@@ -1,6 +1,5 @@
 import LabelUtil from '../LabelUtil/LabelUtil';
-import moment from 'moment';
-import timeFormatLocale from 'd3-time-format/src/locale.js';
+import { timeFormatLocale } from 'd3-time-format';
 import {
   timeSecond,
   timeMinute,
@@ -10,13 +9,46 @@ import {
   timeWeek,
   timeYear
 } from 'd3-time';
-import {axisBottom, axisLeft} from 'd3-axis';
-import formatLocale from 'd3-format/src/locale.js';
-import select from 'd3-selection/src/select';
-import deDE from 'd3-time-format/locale/de-DE.json';
-import enUS from 'd3-time-format/locale/en-US.json';
-import FormatdeDE from 'd3-format/locale/de-DE.json';
-import FormatenUS from 'd3-format/locale/en-US.json';
+import { axisBottom, axisLeft, Axis, AxisDomain, AxisScale } from 'd3-axis';
+import { ScaleLinear } from 'd3-scale';
+import { FormatLocaleDefinition, formatLocale } from 'd3-format';
+import { select } from 'd3-selection';
+import { TimeLocaleDefinition } from 'd3-time-format';
+import { Moment } from 'moment';
+import moment = require('moment');
+import { Scale } from 'src/ScaleUtil/ScaleUtil';
+import { NodeSelection } from 'src/BaseUtil/BaseUtil';
+const deDE: TimeLocaleDefinition = require('d3-time-format/locale/de-DE.json');
+const enUS: TimeLocaleDefinition = require('d3-time-format/locale/en-US.json');
+const FormatdeDE: FormatLocaleDefinition = require('d3-format/locale/de-DE.json');
+const FormatenUS: FormatLocaleDefinition = require('d3-format/locale/en-US.json');
+
+export interface AxisConfiguration {
+  labelRotation?: number;
+  display?: boolean;
+  labelSize?: number;
+  labelPadding?: number;
+  labelColor?: string;
+  label?: string;
+  ticks?: number;
+  tickSize?: number;
+  tickPadding?: number;
+  tickValues?: number[];
+  locale?: 'de' | 'en';
+  autoTicks?: boolean;
+  scale?: string;
+  format?: string;
+  min?: any;
+  max?: any;
+  harmonize?: boolean;
+  factor?: number;
+  orientation: 'x' | 'y';
+  gridWidth?: string;
+  gridColor?: string;
+  showGrid?: boolean;
+  gridOpacity?: number;
+  sanitizeLabels?: boolean;
+}
 
 /**
  * Class with helper functions to create/manage chart axes.
@@ -33,8 +65,8 @@ class AxesUtil {
    * @param  {string} locale The desired locale (de or en currently)
    * @return {function} The multi-scale time format function.
    */
-  static getMultiScaleTimeFormatter(locale) {
-    return date => {
+  static getMultiScaleTimeFormatter(locale: 'de' | 'en'): (date: Moment) => string {
+    return (date: Moment) => {
       date = moment(date);
       const loc = locale.startsWith('de') ? timeFormatLocale(deDE) : timeFormatLocale(enUS);
       const formatMillisecond = loc.format('.%L');
@@ -46,13 +78,14 @@ class AxesUtil {
       const formatMonth = loc.format('%B');
       const formatYear = loc.format('%Y');
 
-      return (timeSecond(date) < date ? formatMillisecond
-        : timeMinute(date) < date ? formatSecond
-          : timeHour(date) < date ? formatMinute
-            : timeDay(date) < date ? formatHour
-              : timeMonth(date) < date ? (timeWeek(date) < date ? formatDay : formatWeek)
-                : timeYear(date) < date ? formatMonth
-                  : formatYear)(date);
+      return (timeSecond(date.toDate()) < date.toDate() ? formatMillisecond
+        : timeMinute(date.toDate()) < date.toDate() ? formatSecond
+          : timeHour(date.toDate()) < date.toDate() ? formatMinute
+            : timeDay(date.toDate()) < date.toDate() ? formatHour
+              : timeMonth(date.toDate()) < date.toDate() ?
+                (timeWeek(date.toDate()) < date.toDate() ? formatDay : formatWeek)
+                : timeYear(date.toDate()) < date.toDate() ? formatMonth
+                  : formatYear)(date.toDate());
     };
   }
 
@@ -63,10 +96,14 @@ class AxesUtil {
    * @param {Function} axisFunc the axis function to create
    * @return {Boolean} the d3 axis object
    */
-  static createAxis(config, scale, axisFunc) {
+  static createAxis(
+    config: AxisConfiguration,
+    scale: Scale,
+    axisFunc: <Domain extends AxisDomain>(scale: AxisScale<Domain>) => Axis<Domain>
+  ) {
     // return early if no config is present
     if (!config) {
-      return;
+      return undefined;
     }
     const locale = config.locale || 'en';
     const format = formatLocale(locale.startsWith('de') ? FormatdeDE : FormatenUS).format;
@@ -75,11 +112,11 @@ class AxesUtil {
       tickFormatter = this.getMultiScaleTimeFormatter(config.locale || 'en');
     } else if (config.scale === 'band') {
       // a numeric format makes no sense here
-      tickFormatter = s => s;
+      tickFormatter = (s: number) => s;
     } else if (config.format) {
       tickFormatter = format(config.format);
     } else {
-      tickFormatter = s => s;
+      tickFormatter = (s: number) => s;
     }
 
     let ticks = config.ticks;
@@ -89,21 +126,25 @@ class AxesUtil {
     if (config.autoTicks) {
       ticks = 9;
       tickValues = [];
-      let cur = scale.domain()[1];
-      // special case to avoid miny = 0 on log scales
-      if (cur < 1) {
-        cur = 0;
-      }
-      for (let i = 1; i <= ticks; ++i) {
-        cur += scale.domain()[0] / 10;
-        if (scale.domain()[0] >= cur && scale.domain()[1] <= cur) {
-          tickValues.push(cur);
+      let dom = scale.domain();
+      if (dom[0] instanceof Number) {
+        dom = dom as number[];
+        let cur: number = dom[1];
+        // special case to avoid miny = 0 on log scales
+        if (cur < 1) {
+          cur = 0;
+        }
+        for (let i = 1; i <= ticks; ++i) {
+          cur += dom[0] / 10;
+          if (scale.domain()[0] >= cur && scale.domain()[1] <= cur) {
+            tickValues.push(cur);
+          }
         }
       }
     }
 
-    const x = axisFunc(scale)
-      .tickFormat(tickFormatter);
+    const x = axisFunc(scale as ScaleLinear<number, number>)
+      .tickFormat(tickFormatter as null);
     if (ticks !== undefined) {
       x.ticks(ticks);
     }
@@ -125,7 +166,7 @@ class AxesUtil {
    * @param {d3.scale} scale the d3 scale object
    * @return {d3.axis} the d3 axis object
    */
-  static createXAxis(config, scale) {
+  static createXAxis(config: AxisConfiguration, scale: Scale) {
     return this.createAxis(config, scale, axisBottom);
   }
 
@@ -135,7 +176,7 @@ class AxesUtil {
    * @param  {d3.scale} scale the d3 scale object
    * @return {d3.axis} the d3 axis object
    */
-  static createYAxis(config, scale) {
+  static createYAxis(config: AxisConfiguration, scale: Scale) {
     return this.createAxis(config, scale, axisLeft);
   }
 
@@ -146,9 +187,14 @@ class AxesUtil {
    * @param  {selection} selection the d3 selection to append the axes to
    * @param  {number} yPosition the y offset
    */
-  static drawYAxis(y, config, selection, yPosition) {
+  static drawYAxis(
+    y: Scale,
+    config: AxisConfiguration,
+    selection: NodeSelection,
+    yPosition: number
+  ): NodeSelection | undefined {
     if (!config || !config.display) {
-      return;
+      return undefined;
     }
     const yAxis = AxesUtil.createYAxis(config, y);
 
@@ -165,7 +211,7 @@ class AxesUtil {
       .attr('class', 'y-axis');
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
-      .call(yAxis);
+      .call(() => yAxis);
 
     const box = axis.node().getBoundingClientRect();
     axis.attr('transform', `translate(${box.width}, ${yPosition})`);
@@ -189,7 +235,12 @@ class AxesUtil {
    * @param  {number[]} size the remaining chart size
    * @param  {Object} config the axis configuration
    */
-  static drawXAxis(x, selection, size, config) {
+  static drawXAxis(
+    x: Scale,
+    selection: NodeSelection,
+    size: [number, number],
+    config: AxisConfiguration
+  ): NodeSelection {
     const xAxis = AxesUtil.createXAxis(config, x);
 
     const axis = selection.insert('g', ':first-child')
@@ -211,14 +262,14 @@ class AxesUtil {
    * Remove overlapping axis labels for a given axis node.
    * @param {d3.selection} node the axis node
    */
-  static sanitizeAxisLabels(node) {
+  static sanitizeAxisLabels(node: NodeSelection) {
     const nodes = node.selectAll('.tick text');
 
     // need to sort the nodes first as the DOM order varies between scale types
     // (log scale seems to put lowest values first)
-    const list = [];
-    nodes.each((text, idx, nodeList) => {
-      list.push(nodeList[idx]);
+    const list: HTMLElement[] = [];
+    nodes.each((_, idx, nodeList) => {
+      list.push(nodeList[idx] as HTMLElement);
     });
     list.sort((a, b) => {
       const abox = a.getBoundingClientRect();
@@ -226,7 +277,7 @@ class AxesUtil {
       return abox.top - bbox.top;
     });
 
-    let lastPos;
+    let lastPos: number;
     list.forEach(text => {
       const box = text.getBoundingClientRect();
       if (lastPos && box.top < lastPos) {

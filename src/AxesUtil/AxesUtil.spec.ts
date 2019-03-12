@@ -1,10 +1,9 @@
 /*eslint-env jest*/
 
-import AxesUtil from './AxesUtil.js';
-import moment from 'moment';
-import scaleLinear from 'd3-scale/src/linear';
-import scaleLog from 'd3-scale/src/log';
-import select from 'd3-selection/src/select';
+import AxesUtil, { AxisConfiguration } from './AxesUtil';
+import * as moment from 'moment';
+import { scaleLinear, scaleLog } from 'd3-scale';
+import { select } from 'd3-selection';
 
 describe('AxesUtil', () => {
 
@@ -13,7 +12,7 @@ describe('AxesUtil', () => {
   });
 
   it('returns a string when formatting time', () => {
-    const fn = AxesUtil.getMultiScaleTimeFormatter('en')();
+    const fn = AxesUtil.getMultiScaleTimeFormatter('en')(moment());
     expect((typeof fn) === 'string').toEqual(true);
   });
 
@@ -68,13 +67,13 @@ describe('AxesUtil', () => {
   });
 
   it('can create d3 axis objects', () => {
-    const result = AxesUtil.createXAxis({}, scaleLinear());
+    const result = AxesUtil.createXAxis({} as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
 
   it('can create d3 axis objects', () => {
-    const result = AxesUtil.createYAxis({}, scaleLinear());
+    const result = AxesUtil.createYAxis({} as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
@@ -87,7 +86,7 @@ describe('AxesUtil', () => {
     const result = AxesUtil.createYAxis({
       scale: 'time',
       autoTicks: true
-    }, scaleLinear());
+    } as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
@@ -95,7 +94,7 @@ describe('AxesUtil', () => {
   it('can create d3 axis objects with custom format', () => {
     const result = AxesUtil.createXAxis({
       format: '04d'
-    }, scaleLinear());
+    } as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
@@ -104,7 +103,7 @@ describe('AxesUtil', () => {
     expect(() => {
       AxesUtil.createXAxis({
         format: 'zzz'
-      }, scaleLinear());
+      } as AxisConfiguration, scaleLinear());
     }).toThrow();
   });
 
@@ -112,14 +111,15 @@ describe('AxesUtil', () => {
     const result = AxesUtil.createYAxis({
       scale: 'log',
       autoTicks: true
-    }, scaleLog().domain([0.2, 0.1]));
+    } as AxisConfiguration, scaleLog().domain([0.2, 0.1]));
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
 
   it('will skip drawing an axis if config is not set or set to be hidden', () => {
     expect(AxesUtil.drawYAxis).not.toThrow();
-    expect(() => AxesUtil.drawYAxis(undefined, {display: false})).not.toThrow();
+    expect(() => AxesUtil.drawYAxis(undefined, {display: false} as AxisConfiguration, undefined, undefined))
+      .not.toThrow();
   });
 
   it('respects the label padding parameter', () => {
@@ -130,7 +130,7 @@ describe('AxesUtil', () => {
       label: 'test',
       labelPadding: 20,
       display: true
-    }, select(svg), 10);
+    } as AxisConfiguration, select(svg), 10);
     expect(axis).not.toBeUndefined();
     const transform = axis.select('g[transform]').attr('transform');
     expect(transform).toEqual('translate(33, 0)');
@@ -143,7 +143,7 @@ describe('AxesUtil', () => {
     const axis = AxesUtil.drawXAxis(x, select(svg), undefined, {
       labelRotation: 45,
       display: true
-    });
+    } as AxisConfiguration);
     expect(axis).not.toBeUndefined();
     expect(axis.select('text').attr('transform')).toEqual('rotate(45)');
   });
@@ -156,7 +156,7 @@ describe('AxesUtil', () => {
       label: 'test',
       labelPadding: 20,
       display: true
-    }, select(svg), 10);
+    } as AxisConfiguration, select(svg), 10);
     AxesUtil.sanitizeAxisLabels(axis);
   });
 

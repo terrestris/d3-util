@@ -1,15 +1,33 @@
-import select from 'd3-selection/src/select';
+import { select } from 'd3-selection';
+import { NodeSelection } from 'src/BaseUtil/BaseUtil';
+
+export type ZoomType = 'transform' | 'rerender' | 'none';
+
+export interface ChartComponent {
+  render: (root: NodeSelection, size?: [number, number]) => void;
+  enableZoom?: (root: NodeSelection, zoomType: ZoomType) => void;
+  resetZoom?: () => void;
+}
+
+export interface ChartConfiguration {
+  size?: [number, number];
+  components: ChartComponent[];
+  zoomType?: ZoomType;
+  dynamicSize?: boolean;
+}
 
 /**
  * Renders a chart according to its configuration.
  */
-class ChartRenderer {
+export class ChartRenderer {
+
+  chartConfig: ChartConfiguration = null;
 
   /**
    * Constructs a renderer object.
    * @param {object} chartConfig the chart configuration to use
    */
-  constructor(chartConfig) {
+  constructor(chartConfig?: ChartConfiguration) {
     this.chartConfig = chartConfig;
   }
 
@@ -18,7 +36,7 @@ class ChartRenderer {
    * @param  {element} element the surrounding element
    * @return {SVGElement} the new root svg node
    */
-  createSvgRoot(element) {
+  createSvgRoot(element: HTMLElement) {
     const {
       size
     } = this.chartConfig;
@@ -36,7 +54,7 @@ class ChartRenderer {
    * Render the chart to the given dom element.
    * @param  {element} element the dom element
    */
-  render(element) {
+  render(element?: HTMLElement) {
     const {
       components,
       size,
@@ -59,8 +77,8 @@ class ChartRenderer {
       // this currently only works properly for legend heights
       let width = 0;
       let height = 0;
-      svg.selectAll('svg > *').each(function() {
-        const box = this.getBoundingClientRect();
+      svg.selectAll('svg > *').each(function(this: HTMLElement) {
+        const box = (this as HTMLElement).getBoundingClientRect();
         width += box.width;
         height += box.height;
         if (this.getAttribute('transform')) {

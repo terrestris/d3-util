@@ -1,7 +1,8 @@
 /*eslint-env jest*/
 
-import BarComponent from './BarComponent.js';
-import select from 'd3-selection/src/select';
+import BarComponent, { BarConfiguration } from './BarComponent';
+import { select } from 'd3-selection';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 
 describe('BarComponent', () => {
 
@@ -37,7 +38,8 @@ describe('BarComponent', () => {
         orientation: 'y',
         display: true
       }
-    }
+    },
+    rotateBarLabel: false
   };
 
   it('is defined', () => {
@@ -45,19 +47,19 @@ describe('BarComponent', () => {
   });
 
   it('can render bars', () => {
-    const component = new BarComponent(config);
+    const component = new BarComponent(config as unknown as BarConfiguration);
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('.barchart').node()).not.toEqual(null);
   });
 
   it('can render bars with rotated labels', () => {
     config.rotateBarLabel = true;
-    const component = new BarComponent(config);
+    const component = new BarComponent(config as unknown as BarConfiguration);
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node, [100, 100]);
+    component.render(node as NodeSelection);
     expect(node.select('.barchart').node()).not.toEqual(null);
     expect(() => component.setUncertaintyVisible(true)).not.toThrow();
     expect(() => component.toggleGrouped('one')).not.toThrow();

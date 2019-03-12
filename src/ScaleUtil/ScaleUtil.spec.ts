@@ -1,7 +1,8 @@
 /*eslint-env jest*/
 
-import ScaleUtil from './ScaleUtil.js';
-import scaleLinear from 'd3-scale/src/linear';
+import ScaleUtil from './ScaleUtil';
+import { scaleLinear } from 'd3-scale';
+import { AxisConfiguration } from '../AxesUtil/AxesUtil';
 
 describe('ScaleUtil', () => {
 
@@ -11,7 +12,7 @@ describe('ScaleUtil', () => {
 
   it('can set the domain for scales', () => {
     const scale = scaleLinear();
-    ScaleUtil.setDomainForScale({}, scale, [1, 1, 2, 3]);
+    ScaleUtil.setDomainForScale({} as AxisConfiguration, scale, [1, 1, 2, 3], false);
     expect(scale.domain()).toEqual([1, 3]);
   });
 
@@ -52,6 +53,10 @@ describe('ScaleUtil', () => {
           orientation: 'x'
         },
         y: {
+          scale: 'log',
+          orientation: 'y'
+        },
+        groupx: {
           scale: 'log',
           orientation: 'y'
         }
@@ -99,7 +104,7 @@ describe('ScaleUtil', () => {
           scale: 'linear',
           orientation: 'y'
         },
-        y2: {
+        groupx: {
           scale: 'time',
           orientation: 'y'
         }

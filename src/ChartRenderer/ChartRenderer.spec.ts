@@ -1,7 +1,7 @@
 /*eslint-env jest*/
 
-import ChartRenderer from './ChartRenderer.js';
-import select from 'd3-selection/src/select';
+import { ChartRenderer } from './ChartRenderer';
+import { select } from 'd3-selection';
 
 describe('ChartRenderer', () => {
 
@@ -35,11 +35,10 @@ describe('ChartRenderer', () => {
 
   it('will render components', () => {
     const components = [{
-      enableZoom: true
+      render: jest.fn(() => undefined),
+      enableZoom: jest.fn(() => undefined),
+      resetZoom: jest.fn(() => undefined)
     }];
-    components[0].render = jest.fn(() => undefined);
-    components[0].enableZoom = jest.fn(() => undefined);
-    components[0].resetZoom = jest.fn(() => undefined);
     const renderer = new ChartRenderer({
       components,
       size: [100, 100]
