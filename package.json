@@ -2,7 +2,8 @@
   "name": "@terrestris/d3-util",
   "version": "0.5.0",
   "description": "A set of helper classes for working with d3 charts.",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
     "lint": "eslint --ext js src/",
