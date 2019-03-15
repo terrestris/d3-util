@@ -55,7 +55,7 @@
     "babel-plugin-dynamic-import-node": "2.2.0",
     "babel-plugin-import": "1.11.0",
     "coveralls": "3.0.3",
-    "d3": "5.9.1",
+    "d3": "5.9.2",
     "d3-tip": "0.9.1",
     "eslint": "5.15.1",
     "jest": "24.4.0",
