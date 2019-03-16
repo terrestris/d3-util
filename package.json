@@ -67,7 +67,7 @@
     "typedoc": "0.14.2",
     "typescript": "3.3.3333",
     "webpack": "4.29.6",
-    "webpack-cli": "3.2.3",
+    "webpack-cli": "3.3.0",
     "whatwg-fetch": "3.0.0"
   }
 }
