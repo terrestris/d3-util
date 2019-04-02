@@ -1,4 +1,5 @@
 import { Selection } from 'd3-selection';
+import LabelUtil from '../LabelUtil/LabelUtil';
 
 export type NodeSelection = Selection<Element, {}, undefined, undefined>;
 export type SVGSelection = Selection<SVGElement, {}, undefined, undefined>;
@@ -15,6 +16,7 @@ export interface TitleConfiguration {
   titlePadding?: string|number;
   titleSize?: number;
   titleColor?: string;
+  maxTitleLength?: number;
 }
 
 /**
@@ -50,15 +52,24 @@ class BaseUtil {
    */
   static addTitle(root: NodeSelection, config: TitleConfiguration, xOffset: number) {
     if (config.title) {
-      root.append('text')
-        .attr('x', (config.size[0] + xOffset + config.position[0]) / 2)
+      const x = (config.size[0] + xOffset + config.position[0]) / 2;
+      const text = root.append('text')
+        .attr('x', x)
         .attr('y', parseInt(config.titlePadding as string, 10) +
           parseInt(config.titleSize as unknown as string || '20', 10))
+        .attr('dy', 0)
         .attr('class', 'timeseries-title')
         .style('text-anchor', 'middle')
         .style('font-size', config.titleSize || 20)
         .style('fill', config.titleColor)
         .text(config.title);
+      if (config.maxTitleLength) {
+        LabelUtil.wordWrap(text, config.maxTitleLength, x, 1.2, x);
+        text.selectAll('tspan')
+          .style('text-anchor', 'middle')
+          .style('font-size', config.titleSize || 20)
+          .style('fill', config.titleColor);
+      }
     }
   }
 
