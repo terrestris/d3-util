@@ -1,4 +1,4 @@
-import { Selection, select } from 'd3-selection';
+import { select } from 'd3-selection';
 import { NodeSelection } from 'src/BaseUtil/BaseUtil';
 
 /**
@@ -49,12 +49,14 @@ class LabelUtil {
    * @param  {Integer} width The maximum width to use
    * @param  {Integer} leftPadding The amount of padding to the left
    * @param  {Integer} lineHeight The lineHeight in em to use
+   * @param  {Integer} initialOffset The initial x offset to use
    */
   static wordWrap(
-    textEl: Selection<HTMLElement, {}, undefined, undefined>,
+    textEl: NodeSelection,
     width: number,
     leftPadding: number,
-    lineHeight: number
+    lineHeight: number,
+    initialOffset: number = 0
   ) {
     textEl.each(function(this: HTMLElement) {
       const text = select(this);
@@ -67,7 +69,7 @@ class LabelUtil {
 
       let tspan = text.text(null)
         .append('tspan')
-        .attr('x', 0)
+        .attr('x', initialOffset)
         .attr('dy', dy + 'em');
       word = words.pop();
       let i = 0;
