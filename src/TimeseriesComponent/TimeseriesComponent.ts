@@ -154,8 +154,10 @@ class TimeseriesComponent implements ChartComponent {
       .attr('class', `series-${idx}`)
       .attr('cx', d => x(d[0] as any))
       .attr('cy', d => y(d[1] as any))
-      .attr('r', '5px')
+      .attr('r', d => d[3] ? d[3].radius || 5 : 5)
       .attr('fill', line.color)
+      .style('fill', d => d[3] ? d[3].fill : undefined)
+      .style('stroke', d => d[3] ? d[3].stroke : undefined)
       .on('mouseover', over)
       .on('mouseout', out);
   }
