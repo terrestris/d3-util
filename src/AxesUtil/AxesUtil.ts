@@ -211,7 +211,7 @@ class AxesUtil {
       .attr('class', 'y-axis');
     axis.append('g')
       .attr('transform', `translate(${pad}, 0)`)
-      .call(() => yAxis);
+      .call(yAxis);
 
     const box = axis.node().getBoundingClientRect();
     axis.attr('transform', `translate(${box.width}, ${yPosition})`);
