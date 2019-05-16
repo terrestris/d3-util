@@ -137,6 +137,7 @@ class BarComponent {
         const translateY = d.belowThreshold ? chartSize[1] - 5 : (y(d.value as any) - 5 || chartSize[1]);
         return `translate(${translateX}, ${translateY})${this.config.rotateBarLabel ? ' rotate(-90)' : ''}`;
       })
+      .attr('class', (d: BarChartDataValue) => `${d.belowThreshold ? 'below-threshold' : 'above-threshold'}`)
       .attr('text-anchor', 'middle')
       .style('font-family', 'sans-serif')
       .style('font-size', '11px')
