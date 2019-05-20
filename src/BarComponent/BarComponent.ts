@@ -176,8 +176,9 @@ class BarComponent {
 
     bars
       .append('rect')
-      .filter(d => !d.belowThreshold)
       .style('fill', d => d.color)
+      .style('display', d => d.belowThreshold ? 'none' : 'block')
+      .attr('class', d => d.belowThreshold ? 'below-threshold' : 'above-threshold')
       .attr('x', d => x(d.index.toString()))
       .attr('y', d => y(d.value as any))
       .attr('width', x.bandwidth())
