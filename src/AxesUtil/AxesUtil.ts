@@ -127,7 +127,7 @@ class AxesUtil {
       ticks = 9;
       tickValues = [];
       let dom = scale.domain();
-      if (dom[0] instanceof Number) {
+      if (typeof dom[0] === 'number' || dom[0] instanceof Number) {
         dom = dom as number[];
         let cur: number = dom[1];
         // special case to avoid miny = 0 on log scales
