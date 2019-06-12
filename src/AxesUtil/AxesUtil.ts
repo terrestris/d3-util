@@ -36,6 +36,7 @@ export interface AxisConfiguration {
   tickValues?: number[];
   locale?: 'de' | 'en';
   autoTicks?: boolean;
+  epsilon?: number;
   scale?: string;
   format?: string;
   min?: any;
