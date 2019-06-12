@@ -10,7 +10,7 @@ import {
   timeYear
 } from 'd3-time';
 import { axisBottom, axisLeft, Axis, AxisDomain, AxisScale } from 'd3-axis';
-import { ScaleLinear } from 'd3-scale';
+import { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
 import { FormatLocaleDefinition, formatLocale } from 'd3-format';
 import { select } from 'd3-selection';
 import { TimeLocaleDefinition } from 'd3-time-format';
@@ -124,26 +124,37 @@ class AxesUtil {
 
     // useful mainly for harmonized log scales on y axis
     if (config.autoTicks) {
-      ticks = 9;
+      ticks = 10;
       tickValues = [];
       let dom = scale.domain();
+
       if (typeof dom[0] === 'number' || dom[0] instanceof Number) {
         dom = dom as number[];
-        let cur: number = dom[1];
+
+        let min = dom[0] < dom[1] ? dom[0] : dom[1];
+        let max = dom[0] > dom[1] ? dom[0] : dom[1];
+
+        if (config.harmonize) {
+          min = Math.pow(10, Math.floor(Math.log(min) * Math.LOG10E));
+          max = Math.pow(10, Math.ceil(Math.log(max) * Math.LOG10E));
+        }
+
+        let cur: number = min;
         // special case to avoid miny = 0 on log scales
         if (cur < 1) {
           cur = 0;
         }
+
         for (let i = 1; i <= ticks; ++i) {
-          cur += dom[0] / 10;
-          if (scale.domain()[0] >= cur && scale.domain()[1] <= cur) {
+          cur += max / ticks;
+          if (max >= cur && min <= cur) {
             tickValues.push(cur);
           }
         }
       }
     }
 
-    const x = axisFunc(scale as ScaleLinear<number, number>)
+    const x = axisFunc(scale as ScaleLinear<number, number> | ScaleLogarithmic<number, any>)
       .tickFormat(tickFormatter as null);
     if (ticks !== undefined) {
       x.ticks(ticks);
