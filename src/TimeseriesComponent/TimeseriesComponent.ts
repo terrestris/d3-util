@@ -74,7 +74,9 @@ class TimeseriesComponent implements ChartComponent {
    */
   constructor(config: TimeseriesConfiguration) {
     this.config = config;
-    if (config.size && (!config.size[0] || !config.size[1])) {
+    if (config.size &&
+      (!Number.isFinite(config.size[0]) || !Number.isFinite(config.size[1]))
+    ) {
       throw 'Invalid size config passed to TimeSeriesComponent: ' + config.size;
     }
     this.fillDefaults(config);

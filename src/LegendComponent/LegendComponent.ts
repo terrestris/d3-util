@@ -42,7 +42,9 @@ class LegendComponent implements ChartComponent {
    */
   constructor(config: LegendConfiguration) {
     this.config = config;
-    if (config.position && (!config.position[0] || !config.position[1])) {
+    if (config.position &&
+      (!Number.isFinite(config.position[0]) || !Number.isFinite(config.position[1]))
+    ) {
       throw 'Invalid position config passed to TimeSeriesComponent: ' + config.position;
     }
     // just ignore legend items w/o type
