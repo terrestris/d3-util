@@ -27,7 +27,7 @@ export type Scales = {
  */
 class ScaleUtil {
 
-  static EPSILON = 0.000001;
+  static EPSILON = 0.01;
 
   /**
    * Recalculates min/max values from data and axis configuration.
@@ -78,6 +78,7 @@ class ScaleUtil {
       axisDomain[0] = Math.pow(10, Math.floor(Math.log(axisDomain[0]) / Math.log(10)));
       axisDomain[1] = Math.pow(10, Math.ceil(Math.log(axisDomain[1]) / Math.log(10)));
     }
+
     if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
       if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
