@@ -43,6 +43,7 @@ class ScaleUtil {
     data: any[],
     reverse: boolean
   ) {
+    const epsilion = axis.epsilon || ScaleUtil.EPSILON;
     let axisDomain;
     let makeDomainNice = true;
     let min;
@@ -79,13 +80,13 @@ class ScaleUtil {
       axisDomain[1] = Math.pow(10, Math.ceil(Math.log(axisDomain[1]) / Math.log(10)));
     }
 
-    if (axis.scale === 'log' && (axisDomain[0] === 0 || axisDomain[1] === 0 ||
+    if (axis.scale === 'log' && (axisDomain[0] < epsilion || axisDomain[1] < epsilion ||
       isNaN(axisDomain[0]) || isNaN(axisDomain[1]))) {
-      if (axisDomain[0] === 0 || isNaN(axisDomain[0])) {
-        axisDomain[0] = axis.epsilon || ScaleUtil.EPSILON;
+      if (axisDomain[0] < epsilion || isNaN(axisDomain[0])) {
+        axisDomain[0] = epsilion;
       }
-      if (axisDomain[1] === 0 || isNaN(axisDomain[1])) {
-        axisDomain[1] = axis.epsilon ||  ScaleUtil.EPSILON;
+      if (axisDomain[1] < epsilion || isNaN(axisDomain[1])) {
+        axisDomain[1] = epsilion;
       }
     }
 
