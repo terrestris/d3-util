@@ -31,6 +31,7 @@ export interface AxisConfiguration {
   labelColor?: string;
   label?: string;
   ticks?: number;
+  tickFormatter?: Function;
   tickSize?: number;
   tickPadding?: number;
   tickValues?: number[];
@@ -109,7 +110,9 @@ class AxesUtil {
     const locale = config.locale || 'en';
     const format = formatLocale(locale.startsWith('de') ? FormatdeDE : FormatenUS).format;
     let tickFormatter;
-    if (config.scale === 'time') {
+    if (config.tickFormatter) {
+      tickFormatter = config.tickFormatter;
+    } else if (config.scale === 'time') {
       tickFormatter = this.getMultiScaleTimeFormatter(config.locale || 'en');
     } else if (config.scale === 'band') {
       // a numeric format makes no sense here
