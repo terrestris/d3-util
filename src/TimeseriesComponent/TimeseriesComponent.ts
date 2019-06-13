@@ -61,6 +61,7 @@ class TimeseriesComponent implements ChartComponent {
   zoomBehaviour: ZoomBehavior<Element, {}>;
   xOffset: number;
   preventYAxisZoom: boolean;
+  preventXAxisZoom: boolean;
   static counter: number = 0;
   rootNode: NodeSelection;
   yScales: YScales;
@@ -581,13 +582,17 @@ class TimeseriesComponent implements ChartComponent {
       .scaleExtent([1, Infinity])
       .on('zoom', () => {
         const eventTransform = event.transform;
-        this.mainScaleX = eventTransform.rescaleX(this.originalScales.XSCALE);
+        if (!this.preventXAxisZoom) {
+          this.mainScaleX = eventTransform.rescaleX(this.originalScales.XSCALE);
+        }
+
         if (!this.preventYAxisZoom) {
           this.yScales = {};
           Object.entries(this.originalScales)
             .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
             .forEach(([key, scale]) => this.yScales[key] = eventTransform.rescaleY(scale));
         }
+
         if (zoomType === 'transform') {
           root.selectAll('.x-axis').remove();
           root.selectAll('.y-axis').remove();
@@ -833,6 +838,14 @@ class TimeseriesComponent implements ChartComponent {
    */
   enableYAxisZoom(enable: boolean) {
     this.preventYAxisZoom = !enable;
+  }
+
+  /**
+   * Set whether x axis zoom is enabled.
+   * @param {boolean} enable if true, x axis zoom will be possible
+   */
+  enableXAxisZoom(enable: boolean) {
+    this.preventXAxisZoom = !enable;
   }
 
 }
