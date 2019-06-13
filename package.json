@@ -47,7 +47,7 @@
     "@types/d3-tip": "3.5.5",
     "@types/d3-transition": "1.1.4",
     "@types/d3-zoom": "1.7.4",
-    "@types/jest": "24.0.13",
+    "@types/jest": "24.0.14",
     "awesome-typescript-loader": "5.2.1",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.8.0",
@@ -66,7 +66,7 @@
     "tslint": "5.17.0",
     "typedoc": "0.14.2",
     "typescript": "3.5.1",
-    "webpack": "4.33.0",
+    "webpack": "4.34.0",
     "webpack-cli": "3.3.4",
     "whatwg-fetch": "3.0.0"
   }
