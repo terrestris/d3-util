@@ -64,7 +64,7 @@
     "rimraf": "^2",
     "ts-jest": "^24",
     "tslint": "^5",
-    "typedoc": "^0",
+    "typedoc": "^0.15.0",
     "typescript": "^3",
     "webpack": "^4",
     "webpack-cli": "^3",
