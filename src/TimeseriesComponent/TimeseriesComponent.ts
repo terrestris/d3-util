@@ -664,6 +664,9 @@ class TimeseriesComponent implements ChartComponent {
       return;
     }
     this.rootNode = root;
+    if (this.config.backgroundColor) {
+      root.style('background-color', this.config.backgroundColor);
+    }
 
     let g = root.selectAll('g.timeseries');
     let chartRoot = g.selectAll('.timeseries-chart');

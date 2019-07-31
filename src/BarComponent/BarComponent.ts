@@ -82,6 +82,9 @@ class BarComponent {
       // refuse to render chart without data
       return;
     }
+    if (this.config.backgroundColor) {
+      root.style('background-color', this.config.backgroundColor);
+    }
 
     let [x, groupedx, y] = ScaleUtil.createBarScales(this.config);
     x.paddingInner(0.1);
