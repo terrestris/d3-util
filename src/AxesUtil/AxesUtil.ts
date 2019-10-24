@@ -13,13 +13,12 @@ import { axisBottom, axisLeft, Axis, AxisDomain, AxisScale } from 'd3-axis';
 import { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
 import { FormatLocaleDefinition, formatLocale } from 'd3-format';
 import { select } from 'd3-selection';
-import { TimeLocaleDefinition } from 'd3-time-format';
 import { Moment } from 'moment';
 import moment = require('moment');
 import { Scale } from 'src/ScaleUtil/ScaleUtil';
 import { NodeSelection } from 'src/BaseUtil/BaseUtil';
-const deDE: TimeLocaleDefinition = require('d3-time-format/locale/de-DE.json');
-const enUS: TimeLocaleDefinition = require('d3-time-format/locale/en-US.json');
+import deDE from '../locales/de-DE';
+import enUS from '../locales/en-US';
 const FormatdeDE: FormatLocaleDefinition = require('d3-format/locale/de-DE.json');
 const FormatenUS: FormatLocaleDefinition = require('d3-format/locale/en-US.json');
 
