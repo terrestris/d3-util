@@ -16,7 +16,7 @@ module.exports = {
         test: /\.ts$/,
         include: /src/,
         loader: 'awesome-typescript-loader'
-      },
+      }
     ]
   },
   optimization: {
