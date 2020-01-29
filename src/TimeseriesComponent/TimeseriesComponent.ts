@@ -670,7 +670,15 @@ class TimeseriesComponent implements ChartComponent {
 
     let g = root.selectAll('g.timeseries');
     let chartRoot = g.selectAll('.timeseries-chart');
+    let visibleState = {};
     if (g.node() && rerender && this.zoomType !== 'transform') {
+      // save visibility state for later
+      root.selectAll('.timeseries-data,.timeseries-line').each(function() {
+        const node = this as HTMLElement;
+        if (node.hasAttribute('visible')) {
+          visibleState[node.getAttribute('class')] = node.getAttribute('visible');
+        }
+      });
       root.selectAll(`#${this.clipId}`).remove();
     }
     root.selectAll('.y-axes,.y-grid-axes').remove();
@@ -719,6 +727,16 @@ class TimeseriesComponent implements ChartComponent {
     );
     root.select('.timeseries-title').remove();
     BaseUtil.addTitle(root, this.config, width);
+
+    // restore visibility state of hidden items
+    Object.keys(visibleState).forEach(cls => {
+      const visible = visibleState[cls];
+      if (visible === 'false') {
+        root.select(`.${cls}`.replace(' ', '.'))
+          .attr('visible', 'false')
+          .style('display', 'none');
+      }
+    });
   }
 
   /**
