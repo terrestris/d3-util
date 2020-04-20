@@ -605,12 +605,10 @@ class TimeseriesComponent implements ChartComponent {
     const zoomSelection = root.select('.timeseries-chart');
     zoomSelection.call(this.zoomBehaviour);
     if (this.config.initialZoom) {
-      this.zoomBehaviour.translateTo(
-        zoomSelection as NodeSelection,
-        this.config.initialZoom.x,
-        this.config.initialZoom.y
-      );
-      this.zoomBehaviour.scaleTo(zoomSelection as NodeSelection, this.config.initialZoom.k);
+      const trans = zoomIdentity
+        .translate(this.config.initialZoom.x, this.config.initialZoom.y)
+        .scale(this.config.initialZoom.k);
+      this.zoomBehaviour.transform(zoomSelection as NodeSelection, trans);
     }
   }
 
