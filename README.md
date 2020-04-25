@@ -1,6 +1,6 @@
 # d3-util
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/terrestris/d3-util.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.com/terrestris/d3-util.svg?branch=master)](https://travis-ci.com/terrestris/d3-util)
 [![Coverage Status](https://coveralls.io/repos/github/terrestris/d3-util/badge.svg?branch=master)](https://coveralls.io/github/terrestris/d3-util?branch=master)
 
