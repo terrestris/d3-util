@@ -37,6 +37,8 @@ export interface BarConfiguration extends BackgroundConfiguration, TitleConfigur
   yOffset?: number;
   rotateBarLabel?: boolean;
   showLabelInsideBar?: boolean;
+  groupedInitiallyHidden: string[];
+  groupsInitiallyHidden: string[];
 }
 
 /**
@@ -123,6 +125,9 @@ class BarComponent {
       `0 0 ${this.chartSize[0] + offsets[0] + (padding ? padding : 0)} ${this.chartSize[1] + offsets[1]}`)
       .attr('width', this.chartSize[0] + offsets[0] + (padding ? padding : 0))
       .attr('height', this.chartSize[1] + offsets[1] + this.config.yOffset);
+
+    this.config.groupsInitiallyHidden.forEach(val => this.toggleGroup(val));
+    this.config.groupedInitiallyHidden.forEach(val => this.toggleGrouped(val));
   }
 
   /**
@@ -232,6 +237,7 @@ class BarComponent {
   /**
    * Toggle the group with the given index.
    * @param  {any} index the x value of the group
+   * @return true, if the group's bars are now visible
    */
   toggleGroup(index: string) {
     const node = this.rootNode.select(`[value="${index}"]`);
@@ -242,11 +248,13 @@ class BarComponent {
       node.style('display', 'none');
       node.attr('visible', 'false');
     }
+    return node.attr('visible') === 'true';
   }
 
   /**
-   * Toggle the grouped bars with the given index
+   * Toggle the grouped bars with the given index.
    * @param  {any} index the x value of the bars
+   * @return true, if the grouped bars are now visible
    */
   toggleGrouped(index: string) {
     const node = this.rootNode.selectAll(`[value="${index}"]`);
@@ -257,6 +265,7 @@ class BarComponent {
       node.style('display', 'none');
       node.attr('visible', 'false');
     }
+    return node.attr('visible') === 'true';
   }
 
   /**

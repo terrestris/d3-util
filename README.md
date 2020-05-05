@@ -57,6 +57,7 @@ The legend items can have the following configuration parameters:
 * `style`: can be an object with svg style parameters such as `stroke`,
   `stroke-width` etc. in order to style the legend icon
 * `title`: the legend text
+* `value`: if set, a `value` attribute will be added to the legend node
 * `type`: can be `'line'`, `'bar'`, `'area'` or `'background'` in order to
   render a line, a small bar chart icon, a line with the area below it filled or
   just a filled block
@@ -76,6 +77,8 @@ configuration parameters:
 * `titleColor`: the color hex string
 * `titlePadding`: title padding from the top
 * `titleSize`: title size
+* `groupedInitiallyHidden`: a list of grouping indexes for bars that should initially be hidden
+* `groupsInitiallyHidden`: a list of group indexes for bars that should initially be hidden
 * `data`: the data object. Example:
 
 ```javascript
