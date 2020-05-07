@@ -39,7 +39,9 @@ describe('BarComponent', () => {
         display: true
       }
     },
-    rotateBarLabel: false
+    rotateBarLabel: false,
+    groupedInitiallyHidden: [] as string[],
+    groupsInitiallyHidden: [] as string[]
   };
 
   it('is defined', () => {

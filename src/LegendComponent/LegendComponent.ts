@@ -15,6 +15,7 @@ interface LegendItemConfiguration {
   style?: object;
   title?: string;
   tooltip?: string;
+  value?: string;
   contextmenuHandler?: (event: any) => any;
   onClick?: (event: any) => any;
   customRenderer?: (legend: NodeSelection) => any;
@@ -100,6 +101,9 @@ class LegendComponent implements ChartComponent {
 
     leg.append('title')
       .text(item.tooltip || item.title);
+    if (item.value) {
+      leg.attr('value', item.value);
+    }
 
     if (item.customRenderer instanceof Function) {
       item.customRenderer(leg);

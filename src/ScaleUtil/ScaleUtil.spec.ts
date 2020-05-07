@@ -61,7 +61,9 @@ describe('ScaleUtil', () => {
           orientation: 'y'
         }
       },
-      size: [100, 100]
+      size: [100, 100],
+      groupedInitiallyHidden: [] as string[],
+      groupsInitiallyHidden: [] as string[]
     });
     expect(scales.length).toEqual(3);
   });
@@ -109,8 +111,10 @@ describe('ScaleUtil', () => {
           orientation: 'y'
         }
       },
-      size: [100, 100]
-    });
+      size: [100, 100],
+      groupedInitiallyHidden: [] as string[],
+      groupsInitiallyHidden: [] as string[]
+      });
     expect(scales.length).toEqual(3);
   });
 
