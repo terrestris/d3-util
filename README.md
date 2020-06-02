@@ -56,6 +56,8 @@ The legend items can have the following configuration parameters:
   clicked
 * `onHover`: can be a function getting the current `d3.event` once the mouse is
   over the item
+* `onMouseOut`: can be a function getting the current `d3.event` once the mouse is
+  leaving the item
 * `style`: can be an object with svg style parameters such as `stroke`,
   `stroke-width` etc. in order to style the legend icon
 * `title`: the legend text
