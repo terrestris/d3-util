@@ -19,6 +19,8 @@ interface LegendItemConfiguration {
   contextmenuHandler?: (event: any) => any;
   onClick?: (event: any) => any;
   customRenderer?: (legend: NodeSelection) => any;
+  onHover?: (event: any) => any;
+  onMouseOut?: (event: any) => any;
 }
 
 interface LegendConfiguration {
@@ -110,9 +112,13 @@ class LegendComponent implements ChartComponent {
     }
     if (item.onClick) {
       leg.style('cursor', 'pointer');
-      leg.on('click', () => {
-        item.onClick(event);
-      });
+      leg.on('click', () => item.onClick(event));
+    }
+    if (item.onHover) {
+      leg.on('mouseover', () => item.onHover(event));
+    }
+    if (item.onMouseOut) {
+      leg.on('mouseleave', () => item.onMouseOut(event));
     }
     if (item.contextmenuHandler) {
       // looks like there's no longtouch event? new Ext.Element won't
