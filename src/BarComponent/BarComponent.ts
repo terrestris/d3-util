@@ -107,9 +107,9 @@ class BarComponent {
       .attr('class', '.bar-group')
       .attr('value', d => d.value);
 
-    const bars = this.renderBars(shapes as NodeSelection, groupedx, y);
-    this.renderUncertainty(bars as NodeSelection, groupedx, y);
-    this.renderLabels(bars as NodeSelection, groupedx, y);
+    const bars = this.renderBars(shapes as unknown as NodeSelection, groupedx, y);
+    this.renderUncertainty(bars as unknown as NodeSelection, groupedx, y);
+    this.renderLabels(bars as unknown as NodeSelection, groupedx, y);
 
     AxesUtil.drawXAxis(x, root, this.config.size, this.config.axes.groupx)
       .attr('transform', `translate(${offsets[0]}, ${this.config.size[1] - offsets[1]})`);
