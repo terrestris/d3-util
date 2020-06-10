@@ -3,7 +3,7 @@ import ScaleUtil, { Scale, Scales } from '../ScaleUtil/ScaleUtil';
 import AxesUtil, { AxisConfiguration } from '../AxesUtil/AxesUtil';
 import BaseUtil, { NodeSelection, BackgroundConfiguration, TitleConfiguration } from '../BaseUtil/BaseUtil';
 import LabelUtil from '../LabelUtil/LabelUtil';
-import { zoomIdentity, zoom, zoomTransform as transform, ZoomBehavior, ZoomTransform } from 'd3-zoom';
+import { zoomIdentity, zoom, zoomTransform as transform, ZoomBehavior, ZoomTransform, ZoomScale } from 'd3-zoom';
 import { select, event, ValueFn } from 'd3-selection';
 import { tip as d3tip } from 'd3';
 import { color as d3color } from 'd3-color';
@@ -605,9 +605,14 @@ class TimeseriesComponent implements ChartComponent {
     const zoomSelection = root.select('.timeseries-chart');
     zoomSelection.call(this.zoomBehaviour);
     if (this.config.initialZoom) {
+      this.yScales = {};
       const trans = zoomIdentity
         .translate(this.config.initialZoom.x, this.config.initialZoom.y)
         .scale(this.config.initialZoom.k);
+      Object.entries(this.originalScales)
+        .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
+        // the typing magic is unfortunately required
+        .forEach(([key, scale]) => this.yScales[key] = trans.rescaleY(scale as unknown as ZoomScale) as Scale);
       this.zoomBehaviour.transform(zoomSelection as NodeSelection, trans);
     }
   }
