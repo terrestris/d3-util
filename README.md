@@ -1,6 +1,5 @@
 # d3-util
 
-
 [![Build Status](https://travis-ci.com/terrestris/d3-util.svg?branch=master)](https://travis-ci.com/terrestris/d3-util)
 [![Coverage Status](https://coveralls.io/repos/github/terrestris/d3-util/badge.svg?branch=master)](https://coveralls.io/github/terrestris/d3-util?branch=master)
 
@@ -191,7 +190,7 @@ The object maps axis ids (with `x` and `y` mandatory) to axis configurations,
 which may have the following options:
 
 * `display`: boolean that determines whether the axis is drawn or not
-* `format`: a d3 format string like `",.2f"`
+* `format`: a d3 format string like `",.2f"` or `"dynamic"`
 * `label`: an optional axis label
 * `labelColor`: the label color hex string
 * `labelPadding`: label padding
@@ -207,6 +206,14 @@ which may have the following options:
 * `tickSize`: the tick size
 * `factor`: if set, the axis' max value will be divided by this value so
   you can get a bigger interval when using auto calculated min/max values
+
+If the format is set to dynamic, it will be dynamically adjusted to the
+following d3-format equivalents, based on the rendered value:
+
+* `value < 1`: `.3f`
+* `1 < value < 10`: `.2f`
+* `10 < value < 100`: `.1f`
+* `100 < value`: `.0f`
 
 A note on line charts: you can have multiple y axes here. Using the line chart
 axis references you can have some lines correspond to one y axis and some lines
