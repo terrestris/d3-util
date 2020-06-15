@@ -116,6 +116,17 @@ class AxesUtil {
     } else if (config.scale === 'band') {
       // a numeric format makes no sense here
       tickFormatter = (s: number) => s;
+    } else if (config.format === 'dynamic') {
+      tickFormatter = (s: number) => {
+        if (s < 1) {
+          return format('.3f')(s);
+        } else if (s < 10) {
+          return format('.2f')(s);
+        } else if (s < 100) {
+          return format('.1f') (s);
+        }
+        return format('.0f')(s);
+      };
     } else if (config.format) {
       tickFormatter = format(config.format);
     } else {
