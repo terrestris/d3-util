@@ -116,6 +116,12 @@ describe('AxesUtil', () => {
     expect((typeof result.scale) === 'function').toEqual(true);
   });
 
+  it('will handle the dynamic axis format', () => {
+    expect(AxesUtil.drawYAxis).not.toThrow();
+    expect(() => AxesUtil.drawYAxis(undefined, {format: 'dynamic'} as AxisConfiguration, undefined, undefined))
+      .not.toThrow();
+  });
+
   it('will skip drawing an axis if config is not set or set to be hidden', () => {
     expect(AxesUtil.drawYAxis).not.toThrow();
     expect(() => AxesUtil.drawYAxis(undefined, {display: false} as AxisConfiguration, undefined, undefined))
