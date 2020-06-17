@@ -127,6 +127,17 @@ class AxesUtil {
         }
         return format('.0f')(s);
       };
+    } else if (config.format.startsWith('[')) {
+      const json = JSON.parse(config.format);
+      tickFormatter = (s: number) => {
+        let value = `${s}`;
+        json.forEach((conf: {min: Number, max: Number, format: string}) => {
+          if (s >= conf.min && s < conf.max) {
+            value = format(conf.format)(s);
+          }
+        });
+        return value;
+      };
     } else if (config.format) {
       tickFormatter = format(config.format);
     } else {

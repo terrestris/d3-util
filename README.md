@@ -190,7 +190,7 @@ The object maps axis ids (with `x` and `y` mandatory) to axis configurations,
 which may have the following options:
 
 * `display`: boolean that determines whether the axis is drawn or not
-* `format`: a d3 format string like `",.2f"` or `"dynamic"`
+* `format`: a d3 format string like `",.2f"`, `"dynamic"` or a json string
 * `label`: an optional axis label
 * `labelColor`: the label color hex string
 * `labelPadding`: label padding
@@ -207,13 +207,31 @@ which may have the following options:
 * `factor`: if set, the axis' max value will be divided by this value so
   you can get a bigger interval when using auto calculated min/max values
 
-If the format is set to dynamic, it will be dynamically adjusted to the
+If the format is set to `"dynamic"`, it will be dynamically adjusted to the
 following d3-format equivalents, based on the rendered value:
 
 * `value < 1`: `.3f`
 * `1 < value < 10`: `.2f`
 * `10 < value < 100`: `.1f`
 * `100 < value`: `.0f`
+
+If the format is set to a json string, it must parse to an array of objects
+like this:
+
+```json
+[{
+  "min": 0,
+  "max": 1,
+  "format": ".3f"
+}, {
+  "min": 1,
+  "max": 100,
+  "format": ".0f"
+}]
+```
+
+A format matches a value, if the value is `>= min` and `< max`. You can use
+`"-Infinity"` and `"Infinity"` for min and max to get unbounded classes.
 
 A note on line charts: you can have multiple y axes here. Using the line chart
 axis references you can have some lines correspond to one y axis and some lines
