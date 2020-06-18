@@ -127,7 +127,7 @@ class AxesUtil {
         }
         return format('.0f')(s);
       };
-    } else if (config.format.startsWith('[')) {
+    } else if (config.format && config.format.startsWith('[')) {
       const json = JSON.parse(config.format);
       tickFormatter = (s: number) => {
         let value = `${s}`;
