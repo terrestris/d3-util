@@ -70,8 +70,8 @@ class BarComponent {
     const xNode = AxesUtil.drawXAxis(x, root, size, this.config.axes.groupx).node();
     const yNode = AxesUtil.drawYAxis(y, this.config.axes.y, root, this.config.position[1]).node();
     const result = [yNode.getBoundingClientRect().width, xNode.getBoundingClientRect().height];
-    xNode.remove();
-    yNode.remove();
+    xNode.parentNode.removeChild(xNode);
+    yNode.parentNode.removeChild(yNode);
     return result;
   }
 
