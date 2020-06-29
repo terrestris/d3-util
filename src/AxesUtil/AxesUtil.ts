@@ -38,7 +38,7 @@ export interface AxisConfiguration {
   autoTicks?: boolean;
   epsilon?: number;
   scale?: string;
-  format?: string;
+  format?: string | [];
   min?: any;
   max?: any;
   harmonize?: boolean;
@@ -127,11 +127,11 @@ class AxesUtil {
         }
         return format('.0f')(s);
       };
-    } else if (config.format && config.format.startsWith('[')) {
-      const json = JSON.parse(config.format);
+    } else if (config.format && Array.isArray(config.format)) {
       tickFormatter = (s: number) => {
+        const list = config.format as [];
         let value = `${s}`;
-        json.forEach((conf: {min: Number, max: Number, format: string}) => {
+        list.forEach((conf: {min: Number, max: Number, format: string}) => {
           if (s >= conf.min && s < conf.max) {
             value = format(conf.format)(s);
           }
@@ -139,7 +139,7 @@ class AxesUtil {
         return value;
       };
     } else if (config.format) {
-      tickFormatter = format(config.format);
+      tickFormatter = format(config.format as string);
     } else {
       tickFormatter = (s: number) => s;
     }

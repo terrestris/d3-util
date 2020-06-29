@@ -190,7 +190,7 @@ The object maps axis ids (with `x` and `y` mandatory) to axis configurations,
 which may have the following options:
 
 * `display`: boolean that determines whether the axis is drawn or not
-* `format`: a d3 format string like `",.2f"`, `"dynamic"` or a json string
+* `format`: a d3 format string like `",.2f"`, `"dynamic"` or a format array
 * `label`: an optional axis label
 * `labelColor`: the label color hex string
 * `labelPadding`: label padding
@@ -215,7 +215,7 @@ following d3-format equivalents, based on the rendered value:
 * `10 < value < 100`: `.1f`
 * `100 < value`: `.0f`
 
-If the format is set to a json string, it must parse to an array of objects
+If the format is set to an array, it must be an array of objects
 like this:
 
 ```json
