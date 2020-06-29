@@ -3,7 +3,12 @@ import ScaleUtil, { Scale, Scales } from '../ScaleUtil/ScaleUtil';
 import AxesUtil, { AxisConfiguration } from '../AxesUtil/AxesUtil';
 import BaseUtil, { NodeSelection, BackgroundConfiguration, TitleConfiguration } from '../BaseUtil/BaseUtil';
 import LabelUtil from '../LabelUtil/LabelUtil';
-import { zoomIdentity, zoom, zoomTransform as transform, ZoomBehavior, ZoomTransform, ZoomScale } from 'd3-zoom';
+import {
+  xyzoomIdentity,
+  xyzoom,
+  xyzoomTransform as transform
+} from 'd3-xyzoom';
+import { ZoomBehavior, ZoomTransform, ZoomScale } from 'd3-zoom';
 import { select, event, ValueFn } from 'd3-selection';
 import { tip as d3tip } from 'd3';
 import { color as d3color } from 'd3-color';
@@ -576,7 +581,7 @@ class TimeseriesComponent implements ChartComponent {
       return;
     }
 
-    this.zoomBehaviour = zoom()
+    this.zoomBehaviour = xyzoom()
       .extent([[0, 0], [this.config.size[0] - this.xOffset, this.config.size[1]]])
       .translateExtent([[0, 0], [this.config.size[0] - this.xOffset, this.config.size[1]]])
       .scaleExtent([1, Infinity])
@@ -606,9 +611,12 @@ class TimeseriesComponent implements ChartComponent {
     zoomSelection.call(this.zoomBehaviour);
     if (this.config.initialZoom) {
       this.yScales = {};
-      const trans = zoomIdentity
+      const trans = xyzoomIdentity
         .translate(this.config.initialZoom.x, this.config.initialZoom.y)
-        .scale(this.config.initialZoom.k);
+        .scale(
+          (this.config.initialZoom as any).kx || this.config.initialZoom.k,
+          (this.config.initialZoom as any).ky || this.config.initialZoom.k
+        );
       Object.entries(this.originalScales)
         .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
         // the typing magic is unfortunately required
@@ -845,7 +853,7 @@ class TimeseriesComponent implements ChartComponent {
    */
   resetZoom() {
     (this.rootNode.select('.timeseries-chart') as NodeSelection)
-      .transition().duration(750).call(this.zoomBehaviour.transform, zoomIdentity);
+      .transition().duration(750).call(this.zoomBehaviour.transform, xyzoomIdentity);
   }
 
   /**
@@ -862,6 +870,9 @@ class TimeseriesComponent implements ChartComponent {
    */
   enableYAxisZoom(enable: boolean) {
     this.preventYAxisZoom = !enable;
+    if (this.zoomBehaviour) {
+      (this.zoomBehaviour as any).scaleRatio([this.preventXAxisZoom ? 0 : 1, this.preventYAxisZoom ? 0 : 1]);
+    }
   }
 
   /**
@@ -870,6 +881,9 @@ class TimeseriesComponent implements ChartComponent {
    */
   enableXAxisZoom(enable: boolean) {
     this.preventXAxisZoom = !enable;
+    if (this.zoomBehaviour) {
+      (this.zoomBehaviour as any).scaleRatio([this.preventXAxisZoom ? 0 : 1, this.preventYAxisZoom ? 0 : 1]);
+    }
   }
 
 }
