@@ -613,7 +613,10 @@ class TimeseriesComponent implements ChartComponent {
       this.yScales = {};
       const trans = xyzoomIdentity
         .translate(this.config.initialZoom.x, this.config.initialZoom.y)
-        .scale(this.config.initialZoom.k);
+        .scale(
+          (this.config.initialZoom as any).kx || this.config.initialZoom.k,
+          (this.config.initialZoom as any).ky || this.config.initialZoom.k
+        );
       Object.entries(this.originalScales)
         .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
         // the typing magic is unfortunately required
