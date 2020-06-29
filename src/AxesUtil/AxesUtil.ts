@@ -127,7 +127,7 @@ class AxesUtil {
         }
         return format('.0f')(s);
       };
-    } else if (config.format && config.format instanceof Array) {
+    } else if (config.format && Array.isArray(config.format)) {
       tickFormatter = (s: number) => {
         const list = config.format as [];
         let value = `${s}`;
