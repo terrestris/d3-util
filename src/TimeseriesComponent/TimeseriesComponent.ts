@@ -8,7 +8,7 @@ import {
   xyzoom,
   xyzoomTransform as transform
 } from 'd3-xyzoom';
-import { ZoomBehavior, ZoomTransform, ZoomScale } from 'd3-zoom';
+import { ZoomBehavior, ZoomTransform } from 'd3-zoom';
 import { select, event, ValueFn } from 'd3-selection';
 import { tip as d3tip } from 'd3';
 import { color as d3color } from 'd3-color';
@@ -614,13 +614,12 @@ class TimeseriesComponent implements ChartComponent {
       const trans = xyzoomIdentity
         .translate(this.config.initialZoom.x, this.config.initialZoom.y)
         .scale(
-          (this.config.initialZoom as any).kx || this.config.initialZoom.k,
-          (this.config.initialZoom as any).ky || this.config.initialZoom.k
+          (this.config.initialZoom as any).kx || this.config.initialZoom.k || 1,
+          (this.config.initialZoom as any).ky || this.config.initialZoom.k || 1
         );
       Object.entries(this.originalScales)
         .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
-        // the typing magic is unfortunately required
-        .forEach(([key, scale]) => this.yScales[key] = trans.rescaleY(scale as unknown as ZoomScale) as Scale);
+        .forEach(([key, scale]) => this.yScales[key] = trans.rescaleY(scale));
       this.zoomBehaviour.transform(zoomSelection as NodeSelection, trans);
     }
   }
