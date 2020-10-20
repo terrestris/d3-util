@@ -25,8 +25,7 @@
     "url": "https://github.com/terrestris/d3-util/issues"
   },
   "homepage": "https://github.com/terrestris/d3-util#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "d3": "^5",
     "d3-tip": "^0"
