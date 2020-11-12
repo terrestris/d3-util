@@ -48,6 +48,7 @@ export interface TimeseriesConfiguration extends BackgroundConfiguration, TitleC
   };
   initialZoom?: ZoomTransform;
   extraClasses?: string;
+  moveToRight?: boolean;
 }
 
 export interface YScales {
@@ -621,6 +622,13 @@ class TimeseriesComponent implements ChartComponent {
         .filter(entry => this.config.axes[entry[0]] && this.config.axes[entry[0]].orientation === 'y')
         .forEach(([key, scale]) => this.yScales[key] = trans.rescaleY(scale));
       this.zoomBehaviour.transform(zoomSelection as NodeSelection, trans);
+      if (this.config.moveToRight) {
+        this.zoomBehaviour.translateTo(
+          zoomSelection as NodeSelection,
+          -this.mainScaleX(this.mainScaleX.domain()[1] as any),
+          this.config.initialZoom.y
+        );
+      }
     }
   }
 

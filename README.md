@@ -140,6 +140,8 @@ following configuration parameters:
 * `titleColor`: the color hex string
 * `titlePadding`: title padding from the top
 * `titleSize`: title size
+* `initialZoom`: if set, an initial zoom transform object (with `x`, `y`, `kx` and `ky` set)
+* `moveToRight`: if set to `true`, the `initialZoom` will be modified so the timeseries is scrolled completely to the right
 * `series`: a list of line chart configurations as follows
 
 A line chart configuration has the following options:
