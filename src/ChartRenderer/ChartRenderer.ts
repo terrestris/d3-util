@@ -14,6 +14,7 @@ export interface ChartConfiguration {
   components: ChartComponent[];
   zoomType?: ZoomType;
   dynamicSize?: boolean;
+  eventFn?: () => {};
 }
 
 /**
@@ -59,7 +60,8 @@ export class ChartRenderer {
       components,
       size,
       zoomType,
-      dynamicSize
+      dynamicSize,
+      eventFn
     } = this.chartConfig;
 
     select(element).selectAll('svg').remove();
@@ -72,6 +74,13 @@ export class ChartRenderer {
         component.enableZoom(svg, zoomType);
       }
     });
+
+    if (eventFn) {
+      svg
+      .on('mousemove', function() {
+        eventFn();
+      });
+    }
 
     if (dynamicSize) {
       // this currently only works properly for legend heights

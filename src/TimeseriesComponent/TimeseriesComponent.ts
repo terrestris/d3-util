@@ -20,11 +20,14 @@ import {
   curveBasis as basis,
   curveNatural as natural,
   curveMonotoneX as monotoneX,
-  line as d3line
+  line as d3line,
+  area as d3area
 } from 'd3-shape';
 import { ChartComponent, ZoomType } from 'src/ChartRenderer/ChartRenderer';
 
 export type TimeseriesDatum = [number, number, Function?, any?];
+
+export type ShapeType = 'line' | 'area';
 
 export interface Timeseries {
   color?: string;
@@ -43,6 +46,7 @@ export interface TimeseriesConfiguration extends BackgroundConfiguration, TitleC
   size?: [number, number];
   position?: [number, number];
   series: Timeseries[];
+  shapeType?: ShapeType;
   axes: {
     [name: string]: AxisConfiguration;
   };
@@ -379,6 +383,28 @@ class TimeseriesComponent implements ChartComponent {
   }
 
   /**
+   * Connect the dots with a line or as an area
+   * @param  {d3.selection} lineg the g node to render the line into
+   * @param  {object} line the series configuration
+   * @param  {number} idx the series index
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   */
+  renderLineOrArea(
+    lineg: NodeSelection,
+    line: Timeseries,
+    idx: number,
+    x: Scale,
+    y: Scale
+  ) {
+    if (this.config.shapeType === 'area') {
+      this.renderArea(lineg, line, idx, x, y);
+    } else {
+      this.renderLine(lineg, line, idx, x, y);
+    }
+  }
+
+  /**
    * Connect the dots with a line.
    * @param  {d3.selection} g the g node to render the line into
    * @param  {object} line the series configuration
@@ -434,6 +460,71 @@ class TimeseriesComponent implements ChartComponent {
         .attr('d', generator)
         .attr('class', `series-${idx}`)
         .style('fill', 'none')
+        .style('stroke-width', width)
+        .style('stroke-dasharray', dash)
+        .style('stroke', color);
+    });
+  }
+
+  /**
+   * Connect the dots with a line as area.
+   * @param  {d3.selection} g the g node to render the line into
+   * @param  {object} line the series configuration
+   * @param  {number} idx the series index
+   * @param  {d3.scale} x the x scale
+   * @param  {d3.scale} y the y scale
+   */
+  renderArea(
+    g: NodeSelection,
+    line: Timeseries,
+    idx: number,
+    x: Scale,
+    y: Scale
+  ) {
+    const lineData = ChartDataUtil.lineDataFromPointData(line.data);
+    let curve: any;
+    switch (line.curveType) {
+      case undefined:
+      case 'linear':
+        curve = linear;
+        break;
+      case 'cubicBasisSpline':
+        curve = basis;
+        break;
+      case 'curveMonotoneX':
+        curve = monotoneX;
+        break;
+      case 'naturalCubicSpline':
+        curve = natural;
+        break;
+      case 'curveStep':
+        curve = step;
+        break;
+      case 'curveStepBefore':
+        curve = stepBefore;
+        break;
+      case 'curveStepAfter':
+        curve = stepAfter;
+        break;
+      default:
+    }
+    lineData.forEach(data => {
+      const generator = d3area()
+        .curve(curve)
+        .x((d: TimeseriesDatum) => x(d[0] as any))
+        .y1((d: TimeseriesDatum) => y(d[1] as any))
+        .y0(y(0 as any));
+
+      const width = line.style ? line.style['stroke-width'] : 1;
+      const dash = line.style ? line.style['stroke-dasharray'] : undefined;
+      const color = (line.style && line.style.stroke) ? line.style.stroke : line.color;
+      const fillColor = (line.style && line.style.fill) ? line.style.fill : line.color;
+
+      g.append('path')
+        .datum(data)
+        .attr('d', generator)
+        .attr('class', `series-${idx}`)
+        .style('fill', fillColor)
         .style('stroke-width', width)
         .style('stroke-dasharray', dash)
         .style('stroke', color);
@@ -553,6 +644,15 @@ class TimeseriesComponent implements ChartComponent {
         .style('text-anchor', 'end');
     } else {
       LabelUtil.handleLabelWrap(axis as NodeSelection);
+    }
+    if (config.label) {
+      axis.append('text')
+        .attr('y', 30)
+        .attr('x', size[0])
+        .style('text-anchor', 'end')
+        .style('font-size', config.labelSize || 13)
+        .style('fill', config.labelColor)
+        .text(config.label);
     }
 
     if (config.showGrid) {
@@ -778,7 +878,7 @@ class TimeseriesComponent implements ChartComponent {
         this.renderDots(dotsg, line, idx, x, y);
       }
       if (!line.skipLine) {
-        this.renderLine(lineg, line, idx, x, y);
+        this.renderLineOrArea(lineg, line, idx, x, y);
       }
       if (line.initiallyVisible === false) {
         dotsg.style('display', 'none')
