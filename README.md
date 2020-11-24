@@ -30,6 +30,8 @@ The chart renderer can be constructed with a few parameters:
   `'rerender'` for a zoom rebuilding the DOM. Using the transform method has the
   effect of also zooming the shapes, i.e. a line of 1px will get bigger when
   zooming in.
+* `eventFn`: the function that will be called on every mouse move over the
+  entire `svg`.
 
 ### Components
 
