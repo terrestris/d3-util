@@ -194,7 +194,7 @@ The object maps axis ids (with `x` and `y` mandatory) to axis configurations,
 which may have the following options:
 
 * `display`: boolean that determines whether the axis is drawn or not
-* `format`: a d3 format string like `",.2f"`, `"dynamic"` or a format array
+* `format`: a d3 format string like `",.2f"`, `"dynamic"`, a format array or a format function
 * `label`: an optional axis label
 * `labelColor`: the label color hex string
 * `labelPadding`: label padding
