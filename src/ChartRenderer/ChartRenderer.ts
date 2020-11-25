@@ -14,7 +14,7 @@ export interface ChartConfiguration {
   components: ChartComponent[];
   zoomType?: ZoomType;
   dynamicSize?: boolean;
-  eventFn?: () => {};
+  onMouseMoveFunc?: () => {};
 }
 
 /**
@@ -61,7 +61,7 @@ export class ChartRenderer {
       size,
       zoomType,
       dynamicSize,
-      eventFn
+      onMouseMoveFunc
     } = this.chartConfig;
 
     select(element).selectAll('svg').remove();
@@ -75,10 +75,10 @@ export class ChartRenderer {
       }
     });
 
-    if (eventFn) {
+    if (onMouseMoveFunc) {
       svg
       .on('mousemove', function() {
-        eventFn();
+        onMouseMoveFunc();
       });
     }
 
