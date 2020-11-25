@@ -38,7 +38,7 @@ export interface AxisConfiguration {
   autoTicks?: boolean;
   epsilon?: number;
   scale?: string;
-  format?: string | [];
+  format?: string | [] | ((s: number) => String);
   min?: any;
   max?: any;
   harmonize?: boolean;
@@ -127,6 +127,8 @@ class AxesUtil {
         }
         return format('.0f')(s);
       };
+    } else if (config.format && typeof config.format === 'function') {
+      tickFormatter = config.format;
     } else if (config.format && Array.isArray(config.format)) {
       tickFormatter = (s: number) => {
         const list = config.format as [];
