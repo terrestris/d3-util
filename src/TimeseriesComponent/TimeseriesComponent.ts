@@ -542,6 +542,16 @@ class TimeseriesComponent implements ChartComponent {
   }
 
   /**
+   * Calculate the height of all currently visible axes.
+   * @param {d3.selection} node a node below which the axes are rendered
+   * @return {Number} the height of all axes
+   */
+  calculateAxesHeight(node: NodeSelection) {
+    const axisElems = node.selectAll('.x-axis').nodes();
+    return axisElems.reduce((acc, cur: SVGElement) => acc + cur.getBoundingClientRect().height, 0);
+  }
+
+  /**
    * Creates an d3 axis from the given scale.
    * @param  {d3.scale} y the y scale
    * @param  {object} series the series configuration
@@ -646,8 +656,9 @@ class TimeseriesComponent implements ChartComponent {
       LabelUtil.handleLabelWrap(axis as NodeSelection);
     }
     if (config.label) {
+      let height = this.calculateAxesHeight(select(selection.node().parentNode) as NodeSelection);
       axis.append('text')
-        .attr('y', 30)
+        .attr('y', (config.labelSize || 13) + height)
         .attr('x', size[0])
         .style('text-anchor', 'end')
         .style('font-size', config.labelSize || 13)
