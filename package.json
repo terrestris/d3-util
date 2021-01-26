@@ -7,7 +7,7 @@
   "scripts": {
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
     "lint": "eslint --ext js src/",
-    "test": "jest --maxWorkers=4",
+    "test": "jest --maxWorkers=4 --coverage",
     "test:watch": "jest --watchAll",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "clean:dist": "rimraf ./dist/*",
