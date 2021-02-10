@@ -25,7 +25,7 @@ import {
 } from 'd3-shape';
 import { ChartComponent, ZoomType } from 'src/ChartRenderer/ChartRenderer';
 
-export type TimeseriesDatum = [number, number, Function?, any?];
+export type TimeseriesDatum = [number, number, Function | undefined, any | undefined];
 
 export type ShapeType = 'line' | 'area';
 
@@ -122,8 +122,8 @@ class TimeseriesComponent implements ChartComponent {
     let out = (): any => undefined;
 
     if (line.showTooltip) {
-      const tip = d3tip().attr('class', 'd3-tip').html((d: any[]) => d[1]);
-      g.call(tip as unknown as (args: any) => NodeSelection);
+      const tip: any = d3tip().attr('class', 'd3-tip').html(d => d[1]);
+      g.call(tip);
       over = tip.show;
       out = tip.hide;
     }
@@ -449,8 +449,8 @@ class TimeseriesComponent implements ChartComponent {
     lineData.forEach(data => {
       const generator = d3line()
         .curve(curve)
-        .x((d: TimeseriesDatum) => x(d[0] as any))
-        .y((d: TimeseriesDatum) => y(d[1] as any));
+        .x(((d: TimeseriesDatum) => x(d[0] as any)) as any)
+        .y(((d: TimeseriesDatum) => y(d[1] as any)) as any);
       const width = line.style ? line.style['stroke-width'] : 1;
       const dash = line.style ? line.style['stroke-dasharray'] : undefined;
       const color = (line.style && line.style.stroke) ? line.style.stroke : line.color;
@@ -511,8 +511,8 @@ class TimeseriesComponent implements ChartComponent {
     lineData.forEach(data => {
       const generator = d3area()
         .curve(curve)
-        .x((d: TimeseriesDatum) => x(d[0] as any))
-        .y1((d: TimeseriesDatum) => y(d[1] as any))
+        .x(((d: TimeseriesDatum) => x(d[0] as any)) as any)
+        .y1(((d: TimeseriesDatum) => y(d[1] as any)) as any)
         .y0(y(0 as any));
 
       const width = line.style ? line.style['stroke-width'] : 1;
