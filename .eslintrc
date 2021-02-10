@@ -7,7 +7,7 @@
     "browser": true,
     "node": true
   },
-  "parser": "babel-eslint",
+  "parser": "typescript",
   "globals": {
     "Promise": false
   },
