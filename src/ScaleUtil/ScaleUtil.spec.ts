@@ -19,7 +19,7 @@ describe('ScaleUtil', () => {
   it('can create scales', () => {
     const scales = ScaleUtil.createScales({
       series: [{
-        data: [[1, 1], [2, 3]],
+        data: [[1, 1, undefined, undefined], [2, 3, undefined, undefined]],
         axes: ['x', 'y']
       }],
       axes: {
@@ -71,7 +71,7 @@ describe('ScaleUtil', () => {
   it('will harmonize log scales', () => {
     const scales = ScaleUtil.createScales({
       series: [{
-        data: [[1, 1], [2, 30]],
+        data: [[1, 1, undefined, undefined], [2, 30, undefined, undefined]],
         axes: ['x', 'y']
       }],
       axes: {
