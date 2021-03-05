@@ -154,8 +154,8 @@ A line chart configuration has the following options:
 * `curveType`: a d3 curve type string like `curveStepBefore`
 * `shapeType`: usually `'line'`, can also be `'area'`
 * `useTooltipFunc`: a boolean indicating whether the third data value is a
-  tooltip function
-* `data`: an array with the data: `[xvalue, yvalue, tooltipFunc, styleObject]`
+  tooltip mouseover function and fifth value is a mouseout function
+* `data`: an array with the data: `[xvalue, yvalue, mouseOverFunc, styleObject, mouseOutFunc]`
 * `initiallyVisible`: a boolean indicating whether the line is initially visible
   defaulting to true
 
