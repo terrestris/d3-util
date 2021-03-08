@@ -132,7 +132,9 @@ class TimeseriesComponent implements ChartComponent {
         d[2](dots[index]);
       };
       out = (d: any[], index: number, dots: any) => {
-        d[4](dots[index]);
+        if (d[4]) {
+          d[4](dots[index]);
+        }
       };
     }
 
