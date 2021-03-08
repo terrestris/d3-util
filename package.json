@@ -28,7 +28,8 @@
   "dependencies": {},
   "peerDependencies": {
     "d3": "^5",
-    "d3-tip": "^0"
+    "d3-tip": "^0",
+    "d3-xyzoom": "^1.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.13",
