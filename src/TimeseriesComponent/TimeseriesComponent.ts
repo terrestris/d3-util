@@ -119,7 +119,7 @@ class TimeseriesComponent implements ChartComponent {
     /** Empty fn. */
     let over = (...args: any): any => undefined;
     /** Empty fn. */
-    let out = (): any => undefined;
+    let out = (...args: any): any => undefined;
 
     if (line.showTooltip) {
       const tip: any = d3tip().attr('class', 'd3-tip').html(d => d[1]);
@@ -130,6 +130,11 @@ class TimeseriesComponent implements ChartComponent {
     if (line.useTooltipFunc) {
       over = (d: any[], index: number, dots: any) => {
         d[2](dots[index]);
+      };
+      out = (d: any[], index: number, dots: any) => {
+        if (d[4]) {
+          d[4](dots[index]);
+        }
       };
     }
 
