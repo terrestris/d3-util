@@ -11,11 +11,19 @@ module.exports = {
   },
   module: {
     rules: [
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
       {
-        test: /\.ts$/,
-        include: /src/,
-        loader: 'awesome-typescript-loader'
+        test: /\.(ts|tsx)$/,
+        include: __dirname + '/src',
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              // disable type checker - we will use it in fork plugin
+              transpileOnly: true,
+            },
+          },
+        ],
       }
     ]
   },
