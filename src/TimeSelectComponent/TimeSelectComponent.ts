@@ -6,9 +6,10 @@ import { ChartComponent, ZoomType } from '../ChartRenderer/ChartRenderer';
 
 export interface TimeSelectConfiguration {
   resolution: number; // in minutes
-  data: number[]; // in unix seconds
+  data: number[]; // in milliseconds
   color: string;
-  duration: number;
+  duration: number; // in milliseconds
+  page: number;
 }
 
 /**
@@ -26,6 +27,8 @@ class TimeSelectComponent implements ChartComponent {
 
   maxCount: number = Number.MIN_SAFE_INTEGER;
 
+  pages: number = 0;
+
   /**
    * Constructs a new time select component with a given configuration.
    * @param {object} config a configuration object
@@ -41,12 +44,15 @@ class TimeSelectComponent implements ChartComponent {
   aggregateData() {
     this.config.data.sort((a, b) => a - b);
     const resolution = this.config.resolution * 60000;
-    let cur = this.config.data[this.config.data.length - 1] - this.config.duration;
+    this.pages = (this.config.data[this.config.data.length - 1] - this.config.data[0]) / this.config.duration;
+    const maxx = this.config.data[this.config.data.length - 1] - (this.pages - this.config.page - 1) * this.config.duration;
+    const minx = maxx - this.config.duration;
+    let cur = minx;
     let curObject = {
       time: cur + resolution / 2,
       count: 0
     };
-    const data = this.config.data.filter(val => val > cur - resolution);
+    const data = this.config.data.filter(val => val >= minx && val <= maxx);
     this.aggregatedData.push(curObject);
     data.forEach(val => {
       if (val < cur + resolution) {
@@ -62,16 +68,23 @@ class TimeSelectComponent implements ChartComponent {
         this.maxCount = Math.max(this.maxCount, ++curObject.count);
       }
     });
-    console.log(this.maxCount)
+  }
+
+  getPages() {
+    return this.pages;
+  }
+
+  setPage(page: number) {
+    this.config.page = page;
+    this.aggregateData();
   }
 
   render(root: NodeSelection, size?: [number, number]) {
+    size = size.slice() as [number, number];
     size[1] = size[1] - 20;
-    const maxx = this.config.data[this.config.data.length - 1] + this.config.resolution * 60000;
-    const minx = maxx - this.config.duration;
     const x = scaleLinear()
       .range([0, size[0]])
-      .domain([minx, maxx]);
+      .domain([this.aggregatedData[0].time, this.aggregatedData[this.aggregatedData.length - 1].time]);
     const y = scaleLinear()
       .range([size[1], 0])
       .domain([0, this.maxCount]);
