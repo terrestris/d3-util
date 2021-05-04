@@ -8,8 +8,16 @@ export interface TimeSelectConfiguration {
   resolution: number; // in minutes
   data: number[]; // in milliseconds
   color: string;
+  selectedColor: string;
+  hoverColor: string;
   duration: number; // in milliseconds
   page: number;
+  selectedTime: number;
+}
+
+interface TimeSelectItem {
+  time: number;
+  count: number;
 }
 
 /**
@@ -20,14 +28,13 @@ class TimeSelectComponent implements ChartComponent {
 
   config: TimeSelectConfiguration;
 
-  aggregatedData: {
-    time: number,
-    count: number
-  }[] = [];
+  aggregatedData: TimeSelectItem[] = [];
 
   maxCount: number = Number.MIN_SAFE_INTEGER;
 
   pages: number = 0;
+
+  selectedTime: number = 0;
 
   /**
    * Constructs a new time select component with a given configuration.
@@ -35,6 +42,7 @@ class TimeSelectComponent implements ChartComponent {
    */
   constructor(config: TimeSelectConfiguration) {
     this.config = config;
+    this.selectedTime = config.selectedTime;
     this.aggregateData();
   }
 
@@ -82,6 +90,7 @@ class TimeSelectComponent implements ChartComponent {
   render(root: NodeSelection, size?: [number, number]) {
     size = size.slice() as [number, number];
     size[1] = size[1] - 20;
+
     const x = scaleLinear()
       .range([0, size[0]])
       .domain([this.aggregatedData[0].time, this.aggregatedData[this.aggregatedData.length - 1].time]);
@@ -91,22 +100,53 @@ class TimeSelectComponent implements ChartComponent {
 
     const axis = axisBottom(x);
     axis.tickFormat(AxesUtil.getMultiScaleTimeFormatter('de'));
+
     root
       .append('g')
       .attr('transform', `translate(0, ${size[1]})`)
       .call(axis);
 
-    root
+    const bars = root
       .selectAll('rect')
       .data(this.aggregatedData)
       .enter()
       .append('rect')
-      .style('fill', () => this.config.color)
+      .style('fill', (d) => d.time === this.selectedTime ? this.config.selectedColor : this.config.color)
+      .style('cursor', 'pointer')
       .attr('x', d => x(d.time))
       .attr('y', d => y(d.count))
-      .attr('width', 10)
-      .attr('height', d => size[1] - y(d.count));
+      .attr('width', 5)
+      .attr('height', d => size[1] - y(d.count))
+      .on('mouseover', (d, index, elems) => {
+        const elem = elems[index];
+        if (this.selectedTime !== d.time) {
+          elem.style.fill = this.config.hoverColor;
+        }
+      })
+      .on('mouseleave', (d, index, elems) => {
+        const elem = elems[index];
+        if (d.time !== this.selectedTime) {
+          elem.style.fill = this.config.color;
+        }
+      })
+      .on('click', (d, index, elems) => {
+        const elem = elems[index];
+        if (this.selectedTime === d.time) {
+          elem.style.fill = this.config.hoverColor;
+          this.selectedTime = 0;
+        } else {
+          if (this.selectedTime !== 0) {
+            bars.each((d1, index1, elems1) => {
+              elems1[index1].style.fill = this.config.color;
+            })
+          }
+          this.selectedTime = d.time;
+          elem.style.fill = this.config.selectedColor;
+        }
+      });
   }
+
+  getSelectedTime = () => this.selectedTime;
 
   enableZoom?: (root: NodeSelection, zoomType: ZoomType) => void;
   resetZoom?: () => void;
