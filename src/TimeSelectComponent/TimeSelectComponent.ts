@@ -13,6 +13,7 @@ export interface TimeSelectConfiguration {
   duration: number; // in milliseconds
   page: number;
   selectedTime: number;
+  onSelectionChange: (time: number) => undefined;
 }
 
 interface TimeSelectItem {
@@ -57,7 +58,7 @@ class TimeSelectComponent implements ChartComponent {
     const minx = maxx - this.config.duration;
     let cur = minx;
     let curObject = {
-      time: cur + resolution / 2,
+      time: cur,
       count: 0
     };
     const data = this.config.data.filter(val => val >= minx && val <= maxx);
@@ -69,7 +70,7 @@ class TimeSelectComponent implements ChartComponent {
         while (val >= cur + resolution) {
           cur += resolution;
           this.aggregatedData.push(curObject = {
-            time: cur + resolution / 2,
+            time: cur,
             count: 0
           });
         }
@@ -136,13 +137,16 @@ class TimeSelectComponent implements ChartComponent {
           this.selectedTime = 0;
         } else {
           if (this.selectedTime !== 0) {
-            bars.each((d1, index1, elems1) => {
-              elems1[index1].style.fill = this.config.color;
+            bars.each((d, index, elems) => {
+              if (d.time === this.selectedTime) {
+                elems[index].style.fill = this.config.color;
+              }
             })
           }
           this.selectedTime = d.time;
           elem.style.fill = this.config.selectedColor;
         }
+        this.config.onSelectionChange(d.time);
       });
   }
 
