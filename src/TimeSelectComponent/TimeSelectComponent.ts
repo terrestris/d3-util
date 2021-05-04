@@ -69,6 +69,9 @@ class TimeSelectComponent implements ChartComponent {
       } else {
         while (val >= cur + resolution) {
           cur += resolution;
+          if (curObject.count === 0) {
+            this.aggregatedData.pop();
+          }
           this.aggregatedData.push(curObject = {
             time: cur,
             count: 0
@@ -77,6 +80,7 @@ class TimeSelectComponent implements ChartComponent {
         this.maxCount = Math.max(this.maxCount, ++curObject.count);
       }
     });
+    this.aggregatedData = this.aggregatedData.filter(d => d.count > 0);
   }
 
   getPages() {
