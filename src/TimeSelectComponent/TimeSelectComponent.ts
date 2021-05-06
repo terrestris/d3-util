@@ -1,19 +1,25 @@
 import { axisBottom } from 'd3-axis';
 import { scaleLinear } from 'd3-scale';
+import { brushX } from 'd3-brush';
+import { event } from 'd3-selection';
 import AxesUtil from '../AxesUtil/AxesUtil';
 import { NodeSelection } from '../BaseUtil/BaseUtil';
 import { ChartComponent, ZoomType } from '../ChartRenderer/ChartRenderer';
 
 export interface TimeSelectConfiguration {
   resolution: number; // in minutes
-  data: number[]; // in milliseconds
+  data: number[];
   color: string;
   selectedColor: string;
   hoverColor: string;
   duration: number; // in milliseconds
   page: number;
   selectedTime: number;
-  onSelectionChange: (time: number) => undefined;
+  selectedTimeRange: number[];
+  useBrush: boolean;
+  brushExtent: [[number, number], [number, number]];
+  initialBrushSelection: [number, number];
+  onSelectionChange: (startTime: number, endTime?: number) => undefined;
 }
 
 interface TimeSelectItem {
@@ -36,6 +42,12 @@ class TimeSelectComponent implements ChartComponent {
   pages: number = 0;
 
   selectedTime: number = 0;
+
+  selectedTimeRange: number[] = [0, 0];
+
+  brushExtent: [[number, number], [number, number]] = [[0, 0], [400, 180]];
+
+  initialBrushSelection: [number, number] = [50, 350];
 
   /**
    * Constructs a new time select component with a given configuration.
@@ -111,54 +123,90 @@ class TimeSelectComponent implements ChartComponent {
       .attr('transform', `translate(0, ${size[1]})`)
       .call(axis);
 
-    const bars = root
-      .selectAll('rect')
-      .data(this.aggregatedData)
-      .enter()
-      .append('rect')
-      .style('fill', (d) => d.time === this.selectedTime ? this.config.selectedColor : this.config.color)
-      .style('cursor', 'pointer')
-      .attr('x', d => x(d.time))
-      .attr('y', d => y(d.count))
-      .attr('width', 5)
-      .attr('height', d => size[1] - y(d.count))
-      .on('mouseover', (d, index, elems) => {
-        const elem = elems[index];
-        if (this.selectedTime !== d.time) {
-          elem.style.fill = this.config.hoverColor;
-        }
-      })
-      .on('mouseleave', (d, index, elems) => {
-        const elem = elems[index];
-        if (d.time !== this.selectedTime) {
-          elem.style.fill = this.config.color;
-        }
-      })
-      .on('click', (d, index, elems) => {
-        const elem = elems[index];
-        if (this.selectedTime === d.time) {
-          elem.style.fill = this.config.hoverColor;
-          this.selectedTime = 0;
-        } else {
-          if (this.selectedTime !== 0) {
-            bars.each((d, index, elems) => {
-              if (d.time === this.selectedTime) {
-                elems[index].style.fill = this.config.color;
-              }
-            })
+    let bars: any;
+    if  (this.config.useBrush) {
+      const brush = brushX()
+          .extent(this.config.brushExtent)
+          .on('end', () => {
+            const startDateTime = x.invert(event.selection[0]);
+            const endDateTime = x.invert(event.selection[1]);
+            this.selectedTimeRange = [startDateTime, endDateTime];
+            this.config.onSelectionChange(startDateTime, endDateTime);
+          });
+      bars = root
+        .selectAll('rect')
+        .append('g')
+        .data(this.aggregatedData)
+        .enter()
+        .append('rect')
+        .style('fill', (d) => {
+          let color = this.config.color;
+          if (this.selectedTimeRange && this.selectedTimeRange.length === 2 &&
+            d.time >= this.selectedTimeRange[0] && d.time <= this.selectedTimeRange[1]) {
+              color = this.config.selectedColor;
           }
-          this.selectedTime = d.time;
-          elem.style.fill = this.config.selectedColor;
-        }
-        this.config.onSelectionChange(d.time);
-      });
+          return color;
+        })
+        .attr('x', d => x(d.time))
+        .attr('y', d => y(d.count))
+        .attr('width', 5)
+        .attr('height', d => size[1] - y(d.count));
+      let initialSelection = this.config.initialBrushSelection;
+      if (this.config.selectedTimeRange) {
+        // given timerange wins over initial selection
+        initialSelection = [x(this.config.selectedTimeRange[0]), x(this.config.selectedTimeRange[1])];
+      }
+      root
+        .call(brush)
+        .call(brush.move, initialSelection)
+    } else {
+      bars = root
+        .selectAll('rect')
+        .data(this.aggregatedData)
+        .enter()
+        .append('rect')
+        .style('fill', (d) => d.time === this.selectedTime ? this.config.selectedColor : this.config.color)
+        .style('cursor', 'pointer')
+        .attr('x', d => x(d.time))
+        .attr('y', d => y(d.count))
+        .attr('width', 5)
+        .attr('height', d => size[1] - y(d.count))
+        .on('mouseover', (d, index, elems) => {
+          const elem = elems[index];
+          if (this.selectedTime !== d.time) {
+            elem.style.fill = this.config.hoverColor;
+          }
+        })
+        .on('mouseleave', (d, index, elems) => {
+          const elem = elems[index];
+          if (d.time !== this.selectedTime) {
+            elem.style.fill = this.config.color;
+          }
+        })
+        .on('click', (d, index, elems) => {
+          const elem = elems[index];
+          if (this.selectedTime === d.time) {
+            elem.style.fill = this.config.hoverColor;
+            this.selectedTime = 0;
+          } else {
+            if (this.selectedTime !== 0) {
+              bars.each((d: any, index: number, elems: any[]) => {
+                if (d.time === this.selectedTime) {
+                  elems[index].style.fill = this.config.color;
+                }
+              })
+            }
+            this.selectedTime = d.time;
+            elem.style.fill = this.config.selectedColor;
+          }
+          this.config.onSelectionChange(d.time);
+        });
+    }
   }
-
   getSelectedTime = () => this.selectedTime;
-
+  getSelectedTimeRange = () => this.selectedTimeRange;
   enableZoom?: (root: NodeSelection, zoomType: ZoomType) => void;
   resetZoom?: () => void;
-
 }
 
 export default TimeSelectComponent;
