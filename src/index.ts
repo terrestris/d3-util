@@ -4,6 +4,7 @@ import ScaleUtil from './ScaleUtil/ScaleUtil';
 import TimeseriesComponent from './TimeseriesComponent/TimeseriesComponent';
 import BarComponent from './BarComponent/BarComponent';
 import LegendComponent from './LegendComponent/LegendComponent';
+import TimeSelectComponent from './TimeSelectComponent/TimeSelectComponent';
 import * as d3 from 'd3';
 
 export {
@@ -13,5 +14,6 @@ export {
   TimeseriesComponent,
   BarComponent,
   LegendComponent,
+  TimeSelectComponent,
   d3
 };
