@@ -5,6 +5,7 @@ import { event } from 'd3-selection';
 import AxesUtil from '../AxesUtil/AxesUtil';
 import { NodeSelection } from '../BaseUtil/BaseUtil';
 import { ChartComponent, ZoomType } from '../ChartRenderer/ChartRenderer';
+import * as moment from 'moment';
 
 export interface TimeSelectConfiguration {
   resolution: number; // in minutes
@@ -116,12 +117,28 @@ class TimeSelectComponent implements ChartComponent {
       .domain([0, this.maxCount]);
 
     const axis = axisBottom(x);
-    axis.tickFormat(AxesUtil.getMultiScaleTimeFormatter('de'));
+    const res = this.config.resolution;
+    const durationInMinutes = (this.aggregatedData[this.aggregatedData.length - 1].time -
+      this.aggregatedData[0].time) / 1000 / 60;
+    let formatString: string = 'DD.MM.YYYY';
+
+    if (res <= 1440) {//resolution in hours or lower
+      if (durationInMinutes < 1440 * 3 && durationInMinutes > 1440) {// duration between 1 and three days
+        formatString = 'DD.MM.YYYY HH:mm';
+      } else if (durationInMinutes <= 1440) {// the same day
+        formatString = 'HH:mm';
+      }
+    }
+    axis.tickFormat(function(time: number) {
+      return moment(time).format(formatString);
+    });
 
     root
       .append('g')
       .attr('transform', `translate(0, ${size[1]})`)
       .call(axis);
+
+    AxesUtil.sanitizeAxisLabels(root, true);
 
     let bars: any;
     if  (this.config.useBrush) {
