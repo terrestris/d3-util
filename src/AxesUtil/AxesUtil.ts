@@ -299,8 +299,9 @@ class AxesUtil {
   /**
    * Remove overlapping axis labels for a given axis node.
    * @param {d3.selection} node the axis node
+   * @param {boolean} horizontal If the labels are placed horizontally
    */
-  static sanitizeAxisLabels(node: NodeSelection) {
+  static sanitizeAxisLabels(node: NodeSelection, horizontal: boolean = false) {
     const nodes = node.selectAll('.tick text');
 
     // need to sort the nodes first as the DOM order varies between scale types
@@ -312,16 +313,16 @@ class AxesUtil {
     list.sort((a, b) => {
       const abox = a.getBoundingClientRect();
       const bbox = b.getBoundingClientRect();
-      return abox.top - bbox.top;
+      return horizontal ? abox.right - bbox.right : abox.top - bbox.top;
     });
 
     let lastPos: number;
     list.forEach(text => {
       const box = text.getBoundingClientRect();
-      if (lastPos && box.top < lastPos) {
+      if (lastPos && (horizontal ? box.right : box.top) < lastPos) {
         select(text).remove();
       } else {
-        lastPos = box.top + box.height;
+        lastPos = horizontal ? box.right + box.width : box.top + box.height;
       }
     });
   }
