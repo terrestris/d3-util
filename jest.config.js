@@ -17,5 +17,6 @@ module.exports = {
     '\\.(js)$': '<rootDir>/node_modules/babel-jest',
     '\\.(ts)$': 'ts-jest'
   },
-  coverageDirectory: '<rootDir>/coverage'
+  coverageDirectory: '<rootDir>/coverage',
+  testEnvironment: 'jsdom'
 };
