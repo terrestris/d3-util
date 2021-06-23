@@ -33,3 +33,6 @@ jobs:
 
     - name: Build artifacts 🏗️
       run: npm run build:dist
+
+    - name: Run tests 🧪
+      run: npm test
