@@ -145,6 +145,9 @@ class TimeSelectComponent implements ChartComponent {
       const brush = brushX()
           .extent(this.config.brushExtent)
           .on('end', () => {
+            if (!event.selection) {
+              return;
+            }
             const startDateTime = x.invert(event.selection[0]);
             const endDateTime = x.invert(event.selection[1]);
             this.selectedTimeRange = [startDateTime, endDateTime];
