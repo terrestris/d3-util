@@ -569,7 +569,7 @@ class TimeseriesComponent implements ChartComponent {
     }
     const yAxis = AxesUtil.createYAxis(config, y);
 
-    let width = this.calculateAxesWidth(select(selection.node().parentNode) as NodeSelection);
+    let width = this.calculateAxesWidth(select(selection.node().parentNode as any) as NodeSelection);
     let pad = config.labelSize || 13;
     if (config.labelPadding) {
       pad += config.labelPadding;
@@ -615,7 +615,7 @@ class TimeseriesComponent implements ChartComponent {
     if (!config.display || !config.showGrid) {
       return;
     }
-    let width = this.calculateAxesWidth(select(selection.node().parentNode) as NodeSelection);
+    let width = this.calculateAxesWidth(select(selection.node().parentNode as any) as NodeSelection);
     const gridAxis = AxesUtil.createYAxis(config, y);
     gridAxis
       .tickFormat('' as null)
@@ -661,7 +661,7 @@ class TimeseriesComponent implements ChartComponent {
       LabelUtil.handleLabelWrap(axis as NodeSelection);
     }
     if (config.label) {
-      let height = this.calculateAxesHeight(select(selection.node().parentNode) as NodeSelection);
+      let height = this.calculateAxesHeight(select(selection.node().parentNode as any) as NodeSelection);
       axis.append('text')
         .attr('y', (config.labelSize || 13) + height)
         .attr('x', size[0])
