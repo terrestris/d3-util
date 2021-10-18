@@ -2,6 +2,7 @@ import { axisBottom } from 'd3-axis';
 import { scaleLinear } from 'd3-scale';
 import { brushX } from 'd3-brush';
 import { event } from 'd3-selection';
+
 import AxesUtil from '../AxesUtil/AxesUtil';
 import { NodeSelection } from '../BaseUtil/BaseUtil';
 import { ChartComponent, ZoomType } from '../ChartRenderer/ChartRenderer';
@@ -21,6 +22,8 @@ export interface TimeSelectConfiguration {
   brushExtent: [[number, number], [number, number]];
   initialBrushSelection: [number, number];
   onSelectionChange: (startTime: number, endTime?: number) => undefined;
+  showTooltip?: boolean;
+  locale?: string;
 }
 
 interface TimeSelectItem {
@@ -220,7 +223,9 @@ class TimeSelectComponent implements ChartComponent {
             elem.style.fill = this.config.selectedColor;
           }
           this.config.onSelectionChange(d.time);
-        });
+        })
+        .append('title')
+        .text(d => this.config.showTooltip ? new Date(d.time).toLocaleString(this.config.locale) : null);
     }
   }
   getSelectedTime = () => this.selectedTime;
