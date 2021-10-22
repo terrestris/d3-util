@@ -111,6 +111,7 @@ class TimeSelectComponent implements ChartComponent {
   render(root: NodeSelection, size?: [number, number]) {
     size = size.slice() as [number, number];
     size[1] = size[1] - 20;
+    size[0] = size[0] - 15;
 
     const x = scaleLinear()
       .range([0, size[0]])
