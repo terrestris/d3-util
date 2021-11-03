@@ -209,6 +209,9 @@ class TimeSelectComponent implements ChartComponent {
         })
         .on('click', (d, index, elems) => {
           const elem = elems[index];
+          (elems as any).forEach((e: HTMLElement) => {
+            e.style.fill = this.config.color;
+          });
           if (this.selectedTime === d.time) {
             elem.style.fill = this.config.hoverColor;
             this.selectedTime = 0;
