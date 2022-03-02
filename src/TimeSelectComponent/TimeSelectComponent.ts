@@ -147,16 +147,24 @@ class TimeSelectComponent implements ChartComponent {
     let bars: any;
     if  (this.config.useBrush) {
       const brush = brushX()
-          .extent(this.config.brushExtent)
-          .on('end', () => {
-            if (!event.selection) {
-              return;
-            }
-            const startDateTime = x.invert(event.selection[0]);
-            const endDateTime = x.invert(event.selection[1]);
-            this.selectedTimeRange = [startDateTime, endDateTime];
-            this.config.onSelectionChange(startDateTime, endDateTime);
-          });
+        .extent(this.config.brushExtent)
+        .on('end', () => {
+          if (!event.selection) {
+            return;
+          }
+          const startDateTime = x.invert(event.selection[0]);
+          const endDateTime = x.invert(event.selection[1]);
+          this.selectedTimeRange = [startDateTime, endDateTime];
+          this.config.onSelectionChange(startDateTime, endDateTime);
+        });
+        let initialSelection = this.config.initialBrushSelection;
+        if (this.config.selectedTimeRange) {
+          // given timerange wins over initial selection
+          initialSelection = [x(this.config.selectedTimeRange[0]), x(this.config.selectedTimeRange[1])];
+        }
+      root
+        .call(brush)
+        .call(brush.move, initialSelection)
       bars = root
         .selectAll('rect')
         .append('g')
@@ -174,15 +182,9 @@ class TimeSelectComponent implements ChartComponent {
         .attr('x', d => x(d.time))
         .attr('y', d => y(d.count))
         .attr('width', 5)
-        .attr('height', d => size[1] - y(d.count));
-      let initialSelection = this.config.initialBrushSelection;
-      if (this.config.selectedTimeRange) {
-        // given timerange wins over initial selection
-        initialSelection = [x(this.config.selectedTimeRange[0]), x(this.config.selectedTimeRange[1])];
-      }
-      root
-        .call(brush)
-        .call(brush.move, initialSelection)
+        .attr('height', d => size[1] - y(d.count))
+        .append('title')
+        .text(d => this.config.showTooltip ? new Date(d.time).toLocaleString(this.config.locale) : null);
     } else {
       bars = root
         .selectAll('rect')
