@@ -24,6 +24,8 @@ export interface TimeSelectConfiguration {
   onSelectionChange: (startTime: number, endTime?: number) => undefined;
   showTooltip?: boolean;
   locale?: string;
+  startTime?: number;
+  endTime?: number;
 }
 
 interface TimeSelectItem {
@@ -113,17 +115,19 @@ class TimeSelectComponent implements ChartComponent {
     size[1] = size[1] - 20;
     size[0] = size[0] - 15;
 
+    const xmin = this.config.startTime ? this.config.startTime : this.aggregatedData[0].time;
+    const xmax = this.config.endTime ? this.config.endTime : this.aggregatedData[this.aggregatedData.length - 1].time;
+
     const x = scaleLinear()
       .range([0, size[0]])
-      .domain([this.aggregatedData[0].time, this.aggregatedData[this.aggregatedData.length - 1].time]);
+      .domain([xmin, xmax]);
     const y = scaleLinear()
       .range([size[1], 0])
       .domain([0, this.maxCount]);
 
     const axis = axisBottom(x);
     const res = this.config.resolution;
-    const durationInMinutes = (this.aggregatedData[this.aggregatedData.length - 1].time -
-      this.aggregatedData[0].time) / 1000 / 60;
+    const durationInMinutes = (xmax - xmin) / 1000 / 60;
     let formatString: string = 'DD.MM.YYYY';
 
     if (res <= 1440) {//resolution in hours or lower
