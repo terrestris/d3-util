@@ -61,7 +61,7 @@
     "eslint": "8.18.0",
     "jest": "28.1.2",
     "jest-environment-jsdom": "28.1.2",
-    "moment": "2.29.3",
+    "moment": "2.29.4",
     "np": "7.6.2",
     "rimraf": "3.0.2",
     "ts-jest": "28.0.5",
