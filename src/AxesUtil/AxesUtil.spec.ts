@@ -1,7 +1,7 @@
 /*eslint-env jest*/
 
 import AxesUtil, { AxisConfiguration } from './AxesUtil';
-import * as moment from 'moment'
+import * as moment from 'moment';
 import { scaleLinear, scaleLog } from 'd3-scale';
 import { select } from 'd3-selection';
 
