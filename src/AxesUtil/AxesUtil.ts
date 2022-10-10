@@ -14,7 +14,6 @@ import { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
 import { FormatLocaleDefinition, formatLocale } from 'd3-format';
 import { select } from 'd3-selection';
 import * as moment from 'moment';
-import { Moment } from 'moment';
 import { Scale } from 'src/ScaleUtil/ScaleUtil';
 import { NodeSelection } from 'src/BaseUtil/BaseUtil';
 import deDE from '../locales/de-DE';
@@ -67,8 +66,8 @@ class AxesUtil {
    * @param  {string} locale The desired locale (de or en currently)
    * @return {function} The multi-scale time format function.
    */
-  static getMultiScaleTimeFormatter(locale: 'de' | 'en'): (date: Moment) => string {
-    return (date: Moment) => {
+  static getMultiScaleTimeFormatter(locale: 'de' | 'en'): (date: moment.Moment) => string {
+    return (date: moment.Moment) => {
       date = moment(date);
       const loc = locale.startsWith('de') ? timeFormatLocale(deDE) : timeFormatLocale(enUS);
       const formatMillisecond = loc.format('.%L');
