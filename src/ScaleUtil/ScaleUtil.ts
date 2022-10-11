@@ -9,9 +9,9 @@ import {
   ScaleLogarithmic,
   ScaleTime
 } from 'd3-scale';
-import { AxisConfiguration } from 'src/AxesUtil/AxesUtil';
-import { TimeseriesConfiguration } from 'src/TimeseriesComponent/TimeseriesComponent';
-import { BarConfiguration } from 'src/BarComponent/BarComponent';
+import { AxisConfiguration } from '../AxesUtil/AxesUtil';
+import { TimeseriesConfiguration } from '../TimeseriesComponent/TimeseriesComponent';
+import { BarConfiguration } from '../BarComponent/BarComponent';
 
 export type Scale = ScaleLinear<number, number>
   | ScaleBand<string>

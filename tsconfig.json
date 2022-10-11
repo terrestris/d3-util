@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
     "checkJs": false,
     "declaration": true,
     "outDir": "dist",
@@ -12,7 +11,6 @@
     "allowJs": false,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "./",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -23,7 +21,7 @@
     "resolveJsonModule": true
   },
   "include": [
-    "src/**/*.ts",
+    "./src/**/*.ts",
     "oltypes.d.ts"
   ],
   "exclude": [

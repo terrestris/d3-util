@@ -1,7 +1,7 @@
 import LabelUtil from '../LabelUtil/LabelUtil';
 import { event } from 'd3-selection';
-import { ChartComponent } from 'src/ChartRenderer/ChartRenderer';
-import { NodeSelection } from 'src/BaseUtil/BaseUtil';
+import { ChartComponent } from '../ChartRenderer/ChartRenderer';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 
 const SVG_DEFS = {
   LEGEND_ICON_BACKGROUND: 'M-3 -14 h 25 v 16 h -25 Z',

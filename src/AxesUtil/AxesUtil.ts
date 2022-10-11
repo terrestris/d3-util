@@ -14,8 +14,8 @@ import { ScaleLinear, ScaleLogarithmic } from 'd3-scale';
 import { FormatLocaleDefinition, formatLocale } from 'd3-format';
 import { select } from 'd3-selection';
 import * as moment from 'moment';
-import { Scale } from 'src/ScaleUtil/ScaleUtil';
-import { NodeSelection } from 'src/BaseUtil/BaseUtil';
+import { Scale } from '../ScaleUtil/ScaleUtil';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 import deDE from '../locales/de-DE';
 import enUS from '../locales/en-US';
 
