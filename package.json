@@ -4,6 +4,10 @@
   "description": "A set of helper classes for working with d3 charts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "prerelease": "npm run build:dist && npm run compile",
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
