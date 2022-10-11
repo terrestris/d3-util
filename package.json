@@ -4,7 +4,12 @@
   "description": "A set of helper classes for working with d3 charts.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
+    "prerelease": "npm run build:dist && npm run compile",
     "release": "np --no-yarn && git push https://github.com/terrestris/d3-util.git master --tags",
     "lint": "eslint --ext js src/",
     "test": "jest --maxWorkers=4 --coverage",
@@ -13,7 +18,8 @@
     "clean:dist": "rimraf ./dist/*",
     "build:dist": "npm run clean:dist && webpack --config browser-build.config.js",
     "build:dev": "npm run clean:dist && webpack --mode=development",
-    "start:dev": "webpack --config dev-build.config.js --watch --mode=development"
+    "start:dev": "webpack --config dev-build.config.js --watch --mode=development",
+    "compile": "tsc --project tsconfig.json"
   },
   "repository": {
     "type": "git",

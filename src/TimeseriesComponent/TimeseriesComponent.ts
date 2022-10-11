@@ -23,7 +23,7 @@ import {
   line as d3line,
   area as d3area
 } from 'd3-shape';
-import { ChartComponent, ZoomType } from 'src/ChartRenderer/ChartRenderer';
+import { ChartComponent, ZoomType } from '../ChartRenderer/ChartRenderer';
 
 export type TimeseriesDatum = [number, number, Function | undefined, any | undefined];
 

@@ -1,5 +1,5 @@
 import { select } from 'd3-selection';
-import { NodeSelection } from 'src/BaseUtil/BaseUtil';
+import { NodeSelection } from '../BaseUtil/BaseUtil';
 
 export type ZoomType = 'transform' | 'rerender' | 'none';
 
