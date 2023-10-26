@@ -133,7 +133,7 @@ class AxesUtil {
       tickFormatter = (s: number) => {
         const list = config.format as [];
         let value = `${s}`;
-        list.forEach((conf: {min: Number, max: Number, format: string}) => {
+        list.forEach((conf: {min: number, max: number, format: string}) => {
           if (s >= conf.min && s < conf.max) {
             value = format(conf.format)(s);
           }

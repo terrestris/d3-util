@@ -52,7 +52,7 @@ describe('BarComponent', () => {
     const component = new BarComponent(config as unknown as BarConfiguration);
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as unknown as NodeSelection);
     expect(node.select('.barchart').node()).not.toEqual(null);
   });
 
@@ -61,7 +61,7 @@ describe('BarComponent', () => {
     const component = new BarComponent(config as unknown as BarConfiguration);
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as unknown as NodeSelection);
     expect(node.select('.barchart').node()).not.toEqual(null);
     expect(() => component.setUncertaintyVisible(true)).not.toThrow();
     expect(() => component.toggleGrouped('one')).not.toThrow();
