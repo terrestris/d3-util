@@ -3,7 +3,7 @@ import { event } from 'd3-selection';
 import { ChartComponent } from '../ChartRenderer/ChartRenderer';
 import { NodeSelection } from '../BaseUtil/BaseUtil';
 
-const SVG_DEFS = {
+const SVG_DEFS: any = {
   LEGEND_ICON_BACKGROUND: 'M-3 -14 h 25 v 16 h -25 Z',
   LEGEND_ICON_AREA: 'M0 -6 C 3 0, 7 0, 10 -6 S 15 -12, 20 -6 M20 -6 v 6 h -20 v -6 Z',
   LEGEND_ICON_BAR: 'M0 -10 h 6 v 12 h -6 Z M7 -6 h 6 v 8 h -6 Z M14 -10 h 6 v 12 h -6 Z',

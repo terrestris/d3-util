@@ -67,13 +67,13 @@ describe('AxesUtil', () => {
   });
 
   it('can create d3 axis objects', () => {
-    const result = AxesUtil.createXAxis({} as AxisConfiguration, scaleLinear());
+    const result: any = AxesUtil.createXAxis({} as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
 
   it('can create d3 axis objects', () => {
-    const result = AxesUtil.createYAxis({} as AxisConfiguration, scaleLinear());
+    const result: any = AxesUtil.createYAxis({} as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
     expect((typeof result.scale) === 'function').toEqual(true);
   });
@@ -83,7 +83,7 @@ describe('AxesUtil', () => {
   });
 
   it('will handle the auto ticks flag', () => {
-    const result = AxesUtil.createYAxis({
+    const result: any = AxesUtil.createYAxis({
       scale: 'time',
       autoTicks: true
     } as AxisConfiguration, scaleLinear());
@@ -92,7 +92,7 @@ describe('AxesUtil', () => {
   });
 
   it('can create d3 axis objects with custom format', () => {
-    const result = AxesUtil.createXAxis({
+    const result: any = AxesUtil.createXAxis({
       format: '04d'
     } as AxisConfiguration, scaleLinear());
     expect((typeof result) === 'function').toEqual(true);
@@ -108,7 +108,7 @@ describe('AxesUtil', () => {
   });
 
   it('will handle the auto ticks flag for log scales', () => {
-    const result = AxesUtil.createYAxis({
+    const result: any = AxesUtil.createYAxis({
       scale: 'log',
       autoTicks: true
     } as AxisConfiguration, scaleLog().domain([0.2, 0.1]));
@@ -118,13 +118,13 @@ describe('AxesUtil', () => {
 
   it('will handle the dynamic axis format', () => {
     expect(AxesUtil.drawYAxis).not.toThrow();
-    expect(() => AxesUtil.drawYAxis(undefined, {format: 'dynamic'} as AxisConfiguration, undefined, undefined))
+    expect(() => AxesUtil.drawYAxis(undefined as any, {format: 'dynamic'} as AxisConfiguration, undefined as any, undefined as any))
       .not.toThrow();
   });
 
   it('will skip drawing an axis if config is not set or set to be hidden', () => {
     expect(AxesUtil.drawYAxis).not.toThrow();
-    expect(() => AxesUtil.drawYAxis(undefined, {display: false} as AxisConfiguration, undefined, undefined))
+    expect(() => AxesUtil.drawYAxis(undefined as any, {display: false} as AxisConfiguration, undefined as any, undefined as any))
       .not.toThrow();
   });
 
@@ -132,11 +132,11 @@ describe('AxesUtil', () => {
     const y = scaleLinear().domain([0, 10]);
     const svg = document.createElement('svg');
     document.body.append(svg);
-    const axis = AxesUtil.drawYAxis(y, {
+    const axis: any = AxesUtil.drawYAxis(y, {
       label: 'test',
       labelPadding: 20,
       display: true
-    } as AxisConfiguration, select(svg), 10);
+    } as AxisConfiguration, select(svg) as any, 10);
     expect(axis).not.toBeUndefined();
     const transform = axis.select('g[transform]').attr('transform');
     expect(transform).toEqual('translate(33, 0)');
@@ -146,7 +146,7 @@ describe('AxesUtil', () => {
     const x = scaleLinear().domain([0, 10]);
     const svg = document.createElement('svg');
     document.body.append(svg);
-    const axis = AxesUtil.drawXAxis(x, select(svg), undefined, {
+    const axis = AxesUtil.drawXAxis(x, select(svg) as any, undefined as any, {
       labelRotation: 45,
       display: true
     } as AxisConfiguration);
@@ -158,11 +158,11 @@ describe('AxesUtil', () => {
     const y = scaleLinear().domain([0, 10]);
     const svg = document.createElement('svg');
     document.body.append(svg);
-    const axis = AxesUtil.drawYAxis(y, {
+    const axis: any = AxesUtil.drawYAxis(y, {
       label: 'test',
       labelPadding: 20,
       display: true
-    } as AxisConfiguration, select(svg), 10);
+    } as AxisConfiguration, select(svg) as any, 10);
     AxesUtil.sanitizeAxisLabels(axis);
   });
 

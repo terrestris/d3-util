@@ -122,7 +122,7 @@ class TimeseriesComponent implements ChartComponent {
     let out = (...args: any): any => undefined;
 
     if (line.showTooltip) {
-      const tip: any = d3tip().attr('class', 'd3-tip').html(d => d[1]);
+      const tip: any = d3tip().attr('class', 'd3-tip').html((d: any) => d[1]);
       g.call(tip);
       over = tip.show;
       out = tip.hide;
@@ -804,7 +804,7 @@ class TimeseriesComponent implements ChartComponent {
 
     let g = root.selectAll('g.timeseries');
     let chartRoot = g.selectAll('.timeseries-chart');
-    let visibleState = {};
+    let visibleState: any = {};
     if (g.node() && rerender && this.zoomType !== 'transform') {
       // save visibility state for later
       root.selectAll('.timeseries-data,.timeseries-line').each(function() {
@@ -881,7 +881,7 @@ class TimeseriesComponent implements ChartComponent {
    * @param {d3.scale[]} yScales the y scales
    */
   renderSeries(rerender: boolean, g: NodeSelection, x: Scale, yScales: Scale[]) {
-    this.config.series.forEach((line, idx) => {
+    this.config.series.forEach((line: any, idx) => {
       if (rerender && this.zoomType === 'transform') {
         return;
       }
@@ -913,7 +913,7 @@ class TimeseriesComponent implements ChartComponent {
    * @return {Function[]} the y scales in order of the series
    */
   prepareYAxes(rerender: boolean, node: NodeSelection, yRange: [number, number]) {
-    const yScales = {};
+    const yScales: any = {};
     const yAxesDrawn: string[] = [];
     let g = node.insert('g', ':first-child').attr('class', 'y-axes');
     this.config.series.forEach(line => {

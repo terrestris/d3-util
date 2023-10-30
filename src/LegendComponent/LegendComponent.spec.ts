@@ -22,7 +22,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as unknown as NodeSelection);
     expect(node.select('.legend').node()).not.toEqual(null);
   });
 
@@ -39,7 +39,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as unknown as NodeSelection);
     expect(node.select('.some-class').node()).not.toEqual(null);
   });
 
@@ -56,7 +56,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as unknown as NodeSelection);
     expect(node.select('g[style]').style('cursor')).toEqual('pointer');
   });
 
@@ -73,7 +73,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as any);
   });
 
   it('can set extra classes', () => {
@@ -89,7 +89,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as any);
     expect(node.select('.some-custom-class').node()).not.toBe(null);
   });
 
@@ -107,7 +107,7 @@ describe('LegendComponent', () => {
     });
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection);
+    component.render(node as any);
     expect(node.selectAll('tspan').size()).toBe(4);
   });
 

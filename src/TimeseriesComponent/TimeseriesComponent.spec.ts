@@ -55,7 +55,7 @@ describe('TimeseriesComponent', () => {
   it('can render line charts', () => {
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection, [100, 100]);
+    component.render(node as unknown as NodeSelection, [100, 100]);
     const series = node.select('.timeseries-line').node();
     expect(series).not.toEqual(null);
     expect(node.select('g.timeseries-chart').node()).not.toEqual(null);
@@ -64,8 +64,8 @@ describe('TimeseriesComponent', () => {
   it('can enable the zoom', () => {
     document.body.innerHTML = '<body><svg width="100" height="100"></svg></body>';
     const node = select(document.body).select('svg');
-    component.render(node as NodeSelection, [100, 100]);
-    component.enableZoom(node as NodeSelection, 'rerender');
+    component.render(node as unknown as NodeSelection, [100, 100]);
+    component.enableZoom(node as unknown as NodeSelection, 'rerender');
     expect(component.zoomBehaviour).not.toBeUndefined();
   });
 
